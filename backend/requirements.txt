@@ -1,0 +1,8 @@
+fastapi>=0.111.0
+uvicorn[standard]
+sqlmodel
+psycopg[binary]
+pydantic-settings
+python-jose[cryptography]
+httpx
+alembic

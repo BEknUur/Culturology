@@ -1,0 +1,27 @@
+[
+    {
+      "id": "kazakh",
+      "name": "Kazakh Eagle Hunters",
+      "tagline": "Ancient nomads of the Altai mountains",
+      "cover": "https://images.unsplash.com/photo-1549649740-7dfaf512e3eb",
+      "description": "The Kazakh eagle hunters of western Mongolia keep alive a 6‑000‑year‑old tradition…",
+      "facts": [
+        "Population ±100,000 in Bayan‑Ölgii aimag",
+        "Practice berkutchi — golden‑eagle hunting",
+        "Speak Kazakh (Kipchak branch of Turkic languages)"
+      ]
+    },
+    {
+      "id": "hadza",
+      "name": "Hadza People",
+      "tagline": "Last hunter‑gatherers of Tanzania",
+      "cover": "https://images.unsplash.com/photo-1470770903676-69b98201ea1c",
+      "description": "The Hadza are one of the few remaining societies that still live by hunting and foraging…",
+      "facts": [
+        "Approx. 1,300 people (2023)",
+        "Speak an isolate language with click consonants",
+        "No formal chiefs or hierarchy"
+      ]
+    }
+  ]
+  

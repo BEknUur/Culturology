@@ -1,0 +1,14 @@
+{
+    "id": "kazakh",
+    "name": "Kazakh Eagle Hunters",
+    "tagline": "Ancient nomads of the Altai mountains",
+    "cover": "...",
+    "description": "...",
+    "facts": ["...", "..."],
+    "images": [
+      "https://images.unsplash.com/photo-1602420466333-9a84d705af79",
+      "https://images.unsplash.com/photo-1551119830-91c017af1d5c",
+      "https://images.unsplash.com/photo-1549649740-7dfaf512e3eb"
+    ]
+  }
+  
