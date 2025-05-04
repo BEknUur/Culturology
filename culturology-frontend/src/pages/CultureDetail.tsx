@@ -6,8 +6,7 @@ import { useUser } from "@clerk/clerk-react";
 import { getCultureBySlug, getQuizByCulture } from "@/api";
 import { Culture, Quiz } from "@/types";
 import Gallery from "@/components/Gallery";
-import Chatbot from "@/components/Chatbot";
-import QuizComponent from "@/components/Quiz";
+import ChatbotPanel from "@/components/ChatbotPanel";
 
 const tabs = ["About", "Traditions", "Lifestyle"] as const;
 
@@ -18,9 +17,7 @@ const CultureDetail = () => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>("About");
 
-  // 1) Ждём, пока Clerk загрузит статус
   if (!isLoaded) return null;
-  // 2) Если не залогинен — редирект
   if (!isSignedIn) return <Navigate to="/signin" replace />;
 
   useEffect(() => {
@@ -43,8 +40,9 @@ const CultureDetail = () => {
       : culture.about;
 
   return (
-    <article className="mx-auto max-w-4xl space-y-8">
+    <article className="mx-auto max-w-4xl space-y-8 pb-32">
       <h1 className="text-3xl font-bold">{culture.name}</h1>
+
       <Gallery images={culture.gallery} />
 
       {/* Tabs */}
@@ -55,7 +53,7 @@ const CultureDetail = () => {
             onClick={() => setActiveTab(t)}
             className={`mr-4 border-b-2 px-2 pb-2 text-lg font-medium ${
               activeTab === t
-                ? "border-primary-500"
+                ? "border-primary-500 text-primary-600"
                 : "border-transparent text-gray-500"
             }`}
           >
@@ -67,14 +65,15 @@ const CultureDetail = () => {
       {/* Content */}
       <div
         className="prose dark:prose-invert"
-        dangerouslySetInnerHTML={{ __html: tabContent ?? "" }}
+        dangerouslySetInnerHTML={{ __html: tabContent?? "" }}
       />
 
-      {/* Chatbot */}
-      <Chatbot slug={culture.slug} />
-
-      {/* Quiz */}
-      {quizzes.length > 0 && <QuizComponent quizzes={quizzes} />}
+      {/* Unified Chat & Quiz Panel */}
+      <ChatbotPanel
+        slug={culture.slug}
+        quizzes={quizzes}
+        about={culture.about?? ""}
+      />
     </article>
   );
 };
