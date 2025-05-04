@@ -34,7 +34,7 @@ const CultureCard = ({ culture }: { culture: Culture }) => {
             group-hover:brightness-110
           "
         />
-        {/* Overlay gradient */}
+       
         <div className="absolute inset-0 bg-gradient-to-t from-stone-900 to-transparent opacity-70"></div>
       </div>
       
@@ -49,7 +49,7 @@ const CultureCard = ({ culture }: { culture: Culture }) => {
           </p>
         )}
         
-        {/* Arrow indicator */}
+        
         <div className="
           absolute
           bottom-4
@@ -74,7 +74,7 @@ const CultureCard = ({ culture }: { culture: Culture }) => {
         </div>
       </div>
       
-      {/* Decorative corner accent */}
+      
       <div className="absolute top-0 left-0 w-12 h-12 overflow-hidden">
         <div className="absolute transform rotate-45 bg-amber-500 text-stone-900 font-bold py-1 left-[-35px] top-[12px] w-[100px] text-center text-xs">
           {culture.language || "Culture"}

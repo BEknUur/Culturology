@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database.session import engine, Base
-from .routes import cultures, quiz, map, chat
+from .routes import cultures, quiz,  chat
 
 app = FastAPI(
     title="Culturology API",
@@ -24,13 +24,11 @@ app.add_middleware(
 )
 
 
-
 Base.metadata.create_all(bind=engine)
 
 
 app.include_router(cultures.router, prefix="/api/cultures", tags=["cultures"])
 app.include_router(quiz.router)
-app.include_router(map.router,      prefix="/api/map",       tags=["map"])
 app.include_router(chat.router,     prefix="/api/chat",      tags=["chat"])
 
 @app.get("/")

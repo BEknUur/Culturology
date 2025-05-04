@@ -35,16 +35,6 @@ export const getRegions = async (): Promise<string[]> => {
 };
 
 
-export interface Point {
-  slug: string;
-  name: string;
-  lat: number;
-  lng: number;
-}
-export const getMapPoints = async (): Promise<Point[]> => {
-  const { data } = await api.get<Point[]>("/api/map");
-  return data;
-};
 
 export const getCulturesByRegion = async (region: string): Promise<Culture[]> => {
   const resp = await axios.get("/api/cultures/search", {
