@@ -1,34 +1,40 @@
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { Navigate } from "react-router-dom";
+
 import * as am5 from "@amcharts/amcharts5";
 import * as am5map from "@amcharts/amcharts5/map";
 import am5geodata_worldLow from "@amcharts/amcharts5-geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 import { getCultures } from "@/api";
+import type { Culture } from "@/types/culture";
 
 const MapPage: React.FC = () => {
   const { isLoaded, isSignedIn } = useUser();
-  const [countries, setCountries] = useState<string[]>([]);
 
   
+  const [highlightedCountries, setHighlightedCountries] = useState<string[]>([]);
+  const [countryToCultures, setCountryToCultures] = useState<Record<string, string[]>>({});
+
+ 
   useEffect(() => {
-    getCultures().then((data) => {
-      const locs = Array.from(
-        new Set(
-          data
-            .map((c) => c.location?.split(",")[0].trim() || "")
-            .filter((l) => !!l)
-        )
-      );
-      setCountries(locs);
+    getCultures().then((data: Culture[]) => {
+      const map: Record<string, string[]> = {};
+      for (const c of data) {
+        const country = c.location?.split(",")[0].trim();
+        if (!country) continue;
+        if (!map[country]) map[country] = [];
+        map[country].push(c.name);
+      }
+      setHighlightedCountries(Object.keys(map));
+      setCountryToCultures(map);
     });
   }, []);
 
   
   useEffect(() => {
-    if (countries.length === 0) return;
+    if (highlightedCountries.length === 0) return;
 
     const root = am5.Root.new("chartdiv");
     root.setThemes([am5themes_Animated.new(root)]);
@@ -42,11 +48,10 @@ const MapPage: React.FC = () => {
       })
     );
 
-    
     const polygonSeries = chart.series.push(
       am5map.MapPolygonSeries.new(root, {
         geoJSON: am5geodata_worldLow as any,
-        exclude: ["AQ"],      
+        exclude: ["AQ"], 
       })
     );
 
@@ -54,19 +59,28 @@ const MapPage: React.FC = () => {
     polygonSeries.mapPolygons.template.setAll({
       fill: am5.color(0xcccccc),
       stroke: am5.color(0x666666),
-      tooltipText: "{name}",
+      tooltipText: "{name}", 
       interactive: true,
     });
 
     
+    polygonSeries.mapPolygons.template.adapters.add("fill", (fill, target) => {
+      const country = (target.dataItem?.dataContext as { name?: string })?.name;
+      if (country && highlightedCountries.includes(country)) {
+        return am5.color(0x3366ff);
+      }
+      return fill;
+    });
+
     polygonSeries.mapPolygons.template.adapters.add(
-      "fill",
-      (fill, target) => {
-        const name = (target.dataItem?.dataContext as { name?: string })?.name;
-        if (name && countries.includes(name)) {
-          return am5.color(0x3366ff);
+      "tooltipText",
+      (text, target) => {
+        const country = (target.dataItem?.dataContext as { name?: string })?.name;
+        if (country && countryToCultures[country]) {
+          
+          return countryToCultures[country].join(", ");
         }
-        return fill;
+        return text;
       }
     );
 
@@ -74,7 +88,7 @@ const MapPage: React.FC = () => {
     return () => {
       root.dispose();
     };
-  }, [countries]);
+  }, [highlightedCountries, countryToCultures]);
 
   if (!isLoaded) return null;
   if (!isSignedIn) return <Navigate to="/signin" replace />;
