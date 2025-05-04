@@ -1,14 +1,12 @@
-// src/api/index.ts
 import axios from "axios";
 import type { Culture } from "@/types/culture";
 import type { Quiz } from "@/types/quiz";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:8000", 
-  // теперь api.get("/api/cultures") → http://localhost:8000/api/cultures
+  
 });
 
-// ---------- CULTURES ----------
 export const getCultures = async (): Promise<Culture[]> => {
   const { data } = await api.get<Culture[]>("/api/cultures");
   return data;
@@ -30,7 +28,13 @@ export const getCultureBySlug = async (slug: string): Promise<Culture> => {
   return data;
 };
 
-// ---------- MAP POINTS ----------
+
+export const getRegions = async (): Promise<string[]> => {
+  const { data } = await api.get<string[]>("/api/cultures/regions");
+  return data;
+};
+
+
 export interface Point {
   slug: string;
   name: string;
@@ -42,7 +46,13 @@ export const getMapPoints = async (): Promise<Point[]> => {
   return data;
 };
 
-// ---------- QUIZ ----------
+export const getCulturesByRegion = async (region: string): Promise<Culture[]> => {
+  const resp = await axios.get("/api/cultures/search", {
+    params: { region },
+  });
+  return resp.data;
+};
+
 export const getQuizByCulture = async (
   cultureId: number
 ): Promise<Quiz[]> => {
@@ -52,7 +62,7 @@ export const getQuizByCulture = async (
   return data;
 };
 
-// ---------- CHAT BOT ----------
+
 export const chatWithAI = async (
   slug: string,
   question: string

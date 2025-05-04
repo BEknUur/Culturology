@@ -1,4 +1,3 @@
-// src/hooks/useFetch.ts
 import { useEffect, useState } from "react";
 
 interface State<T> {

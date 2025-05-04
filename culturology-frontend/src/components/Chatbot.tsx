@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { chatWithAI } from "@/api";
-
 const Chatbot = ({ slug }: { slug: string }) => {
   const [messages, setMessages] = useState<{ role: "user" | "bot"; text: string }[]>([]);
   const [input, setInput] = useState("");

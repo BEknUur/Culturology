@@ -1,46 +1,64 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getRegions } from "@/api";
 
-const regions = [
-  "Africa",
-  "Americas",
-  "Asia",
-  "Europe",
-  "Oceania",
-  "Arctic",
-];
-
-const SearchBar = ({
-  onSearch,
-  onRegionChange,
-}: {
+interface SearchBarProps {
   onSearch: (q: string) => void;
-  onRegionChange: (r?: string) => void;
-}) => {
-  const [q, setQ] = useState("");
-  const handle = (val: string) => {
-    setQ(val);
-    onSearch(val);
-  };
+  onRegionChange: (r: string) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onRegionChange }) => {
+  const [regions, setRegions] = useState<string[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const list = await getRegions();
+        setRegions(list);
+      } catch (err) {
+        console.error("Не удалось загрузить регионы:", err);
+      }
+    })();
+  }, []);
+
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex gap-4">
       <input
-        value={q}
-        onChange={(e) => handle(e.target.value)}
-        placeholder="Search…"
-        className="flex-1 rounded border px-3 py-2"
+        type="text"
+        placeholder="Search cultures..."
+        onChange={(e) => onSearch(e.target.value)}
+        className="
+          flex-1
+          rounded-lg
+          px-5 py-3
+          border-2 border-amber-400
+          bg-stone-50 text-stone-900 placeholder-stone-500
+          focus:outline-none focus:ring-2 focus:ring-amber-500
+          transition-shadow duration-200
+          shadow-lg
+        "
       />
       <select
-        onChange={(e) =>
-          onRegionChange(e.target.value ? e.target.value : undefined)
-        }
-        className="rounded border px-3 py-2"
+        defaultValue=""
+        onChange={(e) => onRegionChange(e.target.value)}
+        className="
+          rounded-lg
+          px-4 py-3
+          border-2 border-amber-400
+          bg-stone-50 text-stone-900
+          focus:outline-none focus:ring-2 focus:ring-amber-500
+          transition-shadow duration-200
+          shadow-lg
+        "
       >
         <option value="">All regions</option>
         {regions.map((r) => (
-          <option key={r}>{r}</option>
+          <option key={r} value={r}>
+            {r}
+          </option>
         ))}
       </select>
     </div>
   );
 };
+
 export default SearchBar;

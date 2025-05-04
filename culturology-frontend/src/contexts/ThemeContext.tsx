@@ -13,19 +13,19 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>("light");
 
-  // при монтировании читаем из localStorage или system preference
+  
   useEffect(() => {
     const saved = localStorage.getItem("theme") as Theme | null;
     if (saved) {
       setTheme(saved);
     } else {
-      // автоопределение
+      
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       setTheme(prefersDark ? "dark" : "light");
     }
   }, []);
 
-  // применяем тему и сохраняем
+  
   useEffect(() => {
     const root = document.documentElement;
     root.classList.toggle("dark", theme === "dark");

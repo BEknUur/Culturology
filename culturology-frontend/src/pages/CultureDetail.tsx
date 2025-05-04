@@ -1,4 +1,3 @@
-// src/pages/CultureDetail.tsx
 import { useEffect, useState } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
@@ -6,7 +5,6 @@ import { useUser } from "@clerk/clerk-react";
 import { getCultureBySlug, getQuizByCulture } from "@/api";
 import { Culture, Quiz } from "@/types";
 import Gallery from "@/components/Gallery";
-import ChatbotPanel from "@/components/ChatbotPanel";
 
 const tabs = ["About", "Traditions", "Lifestyle"] as const;
 
@@ -16,65 +14,113 @@ const CultureDetail = () => {
   const [culture, setCulture] = useState<Culture | null>(null);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>("About");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   if (!isLoaded) return null;
   if (!isSignedIn) return <Navigate to="/signin" replace />;
 
   useEffect(() => {
-    if (!slug) return;
-    (async () => {
-      const data = await getCultureBySlug(slug);
-      setCulture(data);
-      const q = await getQuizByCulture(data.id);
-      setQuizzes(q);
-    })();
+    const loadCultureData = async () => {
+      if (!slug) return;
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getCultureBySlug(slug);
+        setCulture(data);
+        const quizData = await getQuizByCulture(data.id);
+        setQuizzes(quizData);
+      } catch (err: any) {
+        setError(err.message ?? "Ошибка при загрузке данных о культуре");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadCultureData();
   }, [slug]);
 
-  if (!culture) return <p>Loading…</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-amber-900 to-stone-900 pt-24 pb-12">
+        <div className="container mx-auto max-w-4xl px-4">
+          <div className="text-center py-12">
+            <div className="inline-block h-12 w-12 rounded-full border-4 border-amber-500 border-t-transparent animate-spin mb-4"></div>
+            <p className="text-amber-100">Загрузка информации о культуре...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !culture) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-amber-900 to-stone-900 pt-24 pb-12">
+        <div className="container mx-auto max-w-4xl px-4">
+          <div className="text-center py-12 bg-stone-900/60 backdrop-blur-sm rounded-xl p-8 border border-red-900/30">
+            <p className="text-red-400 mb-4">{error || "Культура не найдена"}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-3 bg-amber-700 text-amber-100 rounded-lg hover:bg-amber-600 transition-colors shadow-md"
+            >
+              Попробовать снова
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const tabContent =
-    activeTab === "Traditions"
+    activeTab === "About"
+      ? culture.about
+      : activeTab === "Traditions"
       ? culture.traditions
-      : activeTab === "Lifestyle"
-      ? culture.lifestyle
-      : culture.about;
+      : culture.lifestyle;
 
   return (
-    <article className="mx-auto max-w-4xl space-y-8 pb-32">
-      <h1 className="text-3xl font-bold">{culture.name}</h1>
+    <div className="min-h-screen bg-gradient-to-b from-amber-900 to-stone-900 pt-24 pb-12">
+      <div className="container mx-auto max-w-4xl px-4 space-y-8">
+        
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-amber-100">
+            <span className="text-amber-400">{culture.name}</span>
+          </h1>
+          {culture.region && (
+            <p className="mt-2 text-lg text-amber-100/80">
+              {culture.region} • {culture.population?.toLocaleString() || "Unknown population"}
+            </p>
+          )}
+        </div>
 
-      <Gallery images={culture.gallery} />
+       
+        <div className="rounded-2xl overflow-hidden border-4 border-amber-500 shadow-2xl transform hover:scale-[1.01] transition-transform duration-300">
+          <Gallery images={culture.gallery} />
+        </div>
 
-      {/* Tabs */}
-      <div className="mt-6 border-b">
-        {tabs.map((t) => (
-          <button
-            key={t}
-            onClick={() => setActiveTab(t)}
-            className={`mr-4 border-b-2 px-2 pb-2 text-lg font-medium ${
-              activeTab === t
-                ? "border-primary-500 text-primary-600"
-                : "border-transparent text-gray-500"
-            }`}
-          >
-            {t}
-          </button>
-        ))}
+      
+        <div className="mt-6 flex border-b-4 border-amber-500/50">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`relative mr-4 px-6 py-3 text-lg font-bold ${
+                activeTab === tab
+                  ? "text-amber-300 after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-amber-400 after:rounded-t"
+                  : "text-amber-100/70 hover:text-amber-200 transition-colors"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+        <div className="bg-gradient-to-r from-amber-900/40 to-stone-800/40 rounded-xl p-6 shadow-lg border border-amber-700/30">
+          <div
+            className="prose prose-lg max-w-none text-amber-100 prose-headings:text-amber-300 prose-a:text-amber-400 prose-strong:text-amber-200"
+            dangerouslySetInnerHTML={{ __html: tabContent ?? "" }}
+          />
+        </div>
       </div>
-
-      {/* Content */}
-      <div
-        className="prose dark:prose-invert"
-        dangerouslySetInnerHTML={{ __html: tabContent?? "" }}
-      />
-
-      {/* Unified Chat & Quiz Panel */}
-      <ChatbotPanel
-        slug={culture.slug}
-        quizzes={quizzes}
-        about={culture.about?? ""}
-      />
-    </article>
+    </div>
   );
 };
 

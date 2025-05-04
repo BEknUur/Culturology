@@ -1,43 +1,75 @@
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import React, { useEffect, useState } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  GeoJSON,
+  LayersControl,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { Link } from "react-router-dom";
-import L from "leaflet";
+import worldTopo from "world-atlas/countries-110m.json";
+import { feature } from "topojson-client";
+import type { FeatureCollection } from "geojson";
 
-
-delete (L.Icon.Default as any).prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
-
-interface Point {
-  slug: string;
+export interface CountryClick {
+  isoA3: string;
   name: string;
-  lat: number;
-  lng: number;
 }
 
-const MapWrapper = ({ points }: { points: Point[] }) => {
-  // Leaflet must run in browser; safeguard for SSR tests
-  if (typeof window === "undefined") return null;
+interface MapWrapperProps {
+  onCountryClick: (data: CountryClick) => void;
+}
+
+export default function MapWrapper({ onCountryClick }: MapWrapperProps) {
+  const [countriesGeo, setCountriesGeo] = useState<FeatureCollection>();
+
+  useEffect(() => {
+    
+    const geo = feature(
+      worldTopo as any,
+      (worldTopo as any).objects.countries
+    ) as FeatureCollection;
+    setCountriesGeo(geo);
+  }, []);
+
+  
+  const onEachCountry = (country: any, layer: any) => {
+    const props = country.properties;
+    const isoA3 = props.ISO_A3 as string;
+    const name = props.NAME as string;
+    layer.on({
+      click: () => onCountryClick({ isoA3: isoA3.toLowerCase(), name }),
+      mouseover: () => layer.setStyle({ weight: 2, fillOpacity: 0.7 }),
+      mouseout: () => layer.setStyle({ weight: 1, fillOpacity: 0.5 }),
+    });
+  };
 
   return (
-    <MapContainer center={[20, 0]} zoom={2} className="h-full w-full rounded">
-      <TileLayer
-        attribution="© OpenStreetMap contributors"
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {points.map((p) => (
-        <Marker key={p.slug} position={[p.lat, p.lng]}>
-          <Popup>
-            <Link to={`/cultures/${p.slug}`} className="text-primary-500 underline">
-              {p.name}
-            </Link>
-          </Popup>
-        </Marker>
-      ))}
+    <MapContainer
+      center={[20, 0]}
+      zoom={2}
+      style={{ height: "100%", width: "100%" }}
+    >
+      <LayersControl position="topright">
+        <LayersControl.BaseLayer checked name="OSM">
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution="&copy; OpenStreetMap contributors"
+          />
+        </LayersControl.BaseLayer>
+      </LayersControl>
+
+      {countriesGeo && (
+        <GeoJSON
+          data={countriesGeo}
+          style={{
+            fillColor: "#5a8ed1",
+            color: "#ffffff",
+            weight: 1,
+            fillOpacity: 0.5,
+          }}
+          onEachFeature={onEachCountry}
+        />
+      )}
     </MapContainer>
   );
-};
-export default MapWrapper;
+}
