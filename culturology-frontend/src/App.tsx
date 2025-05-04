@@ -50,7 +50,7 @@ function AppWrapper() {
         </button>
       )}
       {isLoaded && isSignedIn && chatOpen && (
-        <ChatbotPanel slug={slug} />
+        <ChatbotPanel slug={slug} onClose={() => setChatOpen(false)} />
       )}
     </>
   );
