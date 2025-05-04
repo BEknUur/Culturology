@@ -18,7 +18,7 @@ export default function ChatbotPanel({ slug, quizzes,  }: ChatbotPanelProps) {
 
   return (
     <div className="fixed bottom-4 right-4 w-80 max-h-[70vh] bg-white shadow-lg rounded-lg flex flex-col overflow-hidden">
-      
+      {/* Header with tabs */}
       <div className="flex border-b bg-primary-500 text-white">
         {tabs.map((t) => (
           <button
@@ -33,7 +33,7 @@ export default function ChatbotPanel({ slug, quizzes,  }: ChatbotPanelProps) {
         ))}
       </div>
 
-      
+      {/* Content */}
       <div className="flex-1 overflow-auto">
         {activeTab === "Chat" && <Chatbot slug={slug} />}
         {activeTab === "Quizzes" && (

@@ -8,6 +8,7 @@ import CultureDetail from "@/pages/CultureDetail";
 import MapPage from "@/pages/MapPage";
 import SignInPage from "@/pages/SignIn";
 import SignUpPage from "@/pages/SignUp";
+import QuizPage from "@/pages/QuizPage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/cultures" element={<Cultures />} />
             <Route path="/cultures/:slug" element={<CultureDetail />} />
             <Route path="/map" element={<MapPage />} />
+            <Route path="/quizzes/:slug" element={<QuizPage />} />
 
             <Route path="*" element={<Home />} />
           </Routes>

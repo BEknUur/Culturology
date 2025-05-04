@@ -4,3 +4,12 @@ export interface Quiz {
     question: string;
     answer: string;
   }
+
+  export interface QuizItem {
+    id: number;
+    question: string;
+    answer: string;
+    
+    options?: Record<"A"|"B"|"C"|"D", string>;
+    correct?: "A"|"B"|"C"|"D";
+  }

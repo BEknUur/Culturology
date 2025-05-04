@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { Culture } from "@/types/culture";
-import type { Quiz } from "@/types/quiz";
+import type { Quiz, QuizItem } from "@/types/quiz";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:8000", 
@@ -62,6 +62,12 @@ export const getQuizByCulture = async (
   return data;
 };
 
+export const generateQuiz = async (
+  slug: string
+): Promise<QuizItem[]> => {
+  const { data } = await api.post<QuizItem[]>(`/api/quiz/generate/${slug}`);
+  return data;
+};
 
 export const chatWithAI = async (
   slug: string,

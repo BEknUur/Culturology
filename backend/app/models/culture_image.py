@@ -7,5 +7,5 @@ class CultureImage(Base):
 
     id         = Column(Integer, primary_key=True)
     culture_id = Column(Integer, ForeignKey("cultures.id", ondelete="CASCADE"))
-    url        = Column(String, nullable=False)           # прямой URL из S3 / upload
-    caption    = Column(String(255))                      # подпись под фото
+    url        = Column(String, nullable=False)           
+    caption    = Column(String(255))                      

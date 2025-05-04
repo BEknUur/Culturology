@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.get("/", response_model=list[CulturePoint])
 def get_culture_points(db: Session = Depends(get_db)):
-    # отдаём только те, у кого заданы координаты
+    
     cultures = (
         db.query(Culture)
         .filter(Culture.latitude.isnot(None), Culture.longitude.isnot(None))

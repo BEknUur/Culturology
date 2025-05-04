@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, Navigate, useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 
 import { getCultureBySlug, getQuizByCulture } from "@/api";
@@ -11,6 +11,8 @@ const tabs = ["About", "Traditions", "Lifestyle"] as const;
 const CultureDetail = () => {
   const { isLoaded, isSignedIn } = useUser();
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+
   const [culture, setCulture] = useState<Culture | null>(null);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>("About");
@@ -44,7 +46,7 @@ const CultureDetail = () => {
       <div className="min-h-screen bg-gradient-to-b from-amber-900 to-stone-900 pt-24 pb-12">
         <div className="container mx-auto max-w-4xl px-4">
           <div className="text-center py-12">
-            <div className="inline-block h-12 w-12 rounded-full border-4 border-amber-500 border-t-transparent animate-spin mb-4"></div>
+            <div className="inline-block h-12 w-12 rounded-full border-4 border-amber-500 border-t-transparent animate-spin mb-4" />
             <p className="text-amber-100">Загрузка информации о культуре...</p>
           </div>
         </div>
@@ -87,17 +89,18 @@ const CultureDetail = () => {
           </h1>
           {culture.region && (
             <p className="mt-2 text-lg text-amber-100/80">
-              {culture.region} • {culture.population?.toLocaleString() || "Unknown population"}
+              {culture.region} •{" "}
+              {culture.population?.toLocaleString() || "Unknown population"}
             </p>
           )}
         </div>
 
-       
+        
         <div className="rounded-2xl overflow-hidden border-4 border-amber-500 shadow-2xl transform hover:scale-[1.01] transition-transform duration-300">
           <Gallery images={culture.gallery} />
         </div>
 
-      
+        
         <div className="mt-6 flex border-b-4 border-amber-500/50">
           {tabs.map((tab) => (
             <button
@@ -113,11 +116,27 @@ const CultureDetail = () => {
             </button>
           ))}
         </div>
+
+        
         <div className="bg-gradient-to-r from-amber-900/40 to-stone-800/40 rounded-xl p-6 shadow-lg border border-amber-700/30">
           <div
             className="prose prose-lg max-w-none text-amber-100 prose-headings:text-amber-300 prose-a:text-amber-400 prose-strong:text-amber-200"
             dangerouslySetInnerHTML={{ __html: tabContent ?? "" }}
           />
+        </div>
+
+        
+        <div className="text-center pt-6">
+          <button
+            onClick={() =>
+              navigate(`/quizzes/${culture.slug}`, {
+                state: { id: culture.id },
+              })
+            }
+            className="rounded-lg bg-amber-600 px-8 py-3 font-serif text-white shadow hover:bg-amber-500 transition"
+          >
+            Start Quiz
+          </button>
         </div>
       </div>
     </div>

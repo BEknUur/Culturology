@@ -17,7 +17,7 @@ const Navbar = () => {
         </NavLink>
 
         <div className="flex items-center space-x-6">
-          {["/cultures", "/map", "/gallery"].map((path, i) => {
+          {["/cultures", "/map", "/gallery",].map((path, i) => {
             const label = path.slice(1).charAt(0).toUpperCase() + path.slice(2);
             return (
               <NavLink
@@ -31,7 +31,9 @@ const Navbar = () => {
               >
                 {label}
               </NavLink>
+              
             );
+            
           })}
 
           {isLoaded ? (
@@ -50,6 +52,7 @@ const Navbar = () => {
             <div className="h-8 w-8 animate-pulse rounded-full bg-amber-700/50" />
           )}
         </div>
+        
       </div>
     </nav>
   );
