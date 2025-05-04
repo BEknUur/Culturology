@@ -1,17 +1,17 @@
 from fastapi import FastAPI
-from app.api.v1 import people, cultures
-from app.api.v1 import people, cultures, admin, map as map_api, quizzes, chat
-app = FastAPI(title="Culturology API")
+from .routes import cultures, quiz, map, chat
+from .database.session import engine, Base        # Base теперь подгружаем отсюда
 
-app.include_router(people.router, prefix="/api/v1")
-app.include_router(cultures.router, prefix="/api/v1")
+app = FastAPI()
 
-app.include_router(admin.router, prefix="/api/v1")
-app.include_router(map_api.router, prefix="/api/v1")
-app.include_router(quizzes.router, prefix="/api/v1")
-app.include_router(chat.router, prefix="/api/v1")
+app.include_router(cultures.router, prefix="/api/cultures", tags=["cultures"])
+app.include_router(quiz.router,     prefix="/api/quiz",     tags=["quiz"])
+app.include_router(map.router,      prefix="/api/map",      tags=["map"])
+app.include_router(chat.router,     prefix="/api/chat",     tags=["chat"])
 
+# создаём таблицы ОДИН раз, после того как все модели импортированы
+Base.metadata.create_all(bind=engine)
 
-@app.get("/ping")
-async def ping():
-    return {"status": "ok"}
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to Culturology API!"}
