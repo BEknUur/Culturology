@@ -5,7 +5,6 @@ interface SearchBarProps {
   onSearch: (q: string) => void;
   onRegionChange: (r: string) => void;
 }
-
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onRegionChange }) => {
   const [regions, setRegions] = useState<string[]>([]);
 

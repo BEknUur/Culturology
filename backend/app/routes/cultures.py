@@ -9,7 +9,6 @@ from ..schemas.culture import CultureCreate, CultureUpdate, CultureOut
 
 router = APIRouter()
 
-
 @router.get("/regions", response_model=list[str], tags=["cultures"])
 def list_regions(db: Session = Depends(get_db)):
     

@@ -1,8 +1,5 @@
-
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from .database.session import engine, Base
 from .routes import cultures, quiz,  chat
 
@@ -26,11 +23,7 @@ app.add_middleware(
 
 Base.metadata.create_all(bind=engine)
 
-
 app.include_router(cultures.router, prefix="/api/cultures", tags=["cultures"])
 app.include_router(quiz.router)
-app.include_router(chat.router,     prefix="/api/chat",      tags=["chat"])
+app.include_router(chat.router)
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to Culturology API!"}

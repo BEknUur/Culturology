@@ -13,3 +13,10 @@ export interface Quiz {
     options?: Record<"A"|"B"|"C"|"D", string>;
     correct?: "A"|"B"|"C"|"D";
   }
+  export interface ChatRequest {
+    slug: string;
+    question: string;
+  }
+  export interface ChatResponse {
+    answer: string;
+  }

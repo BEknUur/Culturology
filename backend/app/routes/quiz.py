@@ -2,7 +2,6 @@ import os
 import json
 import random
 from dotenv import load_dotenv
-
 import openai
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
@@ -11,8 +10,6 @@ from ..database.session import get_db
 from ..models.culture import Culture
 from ..models.quiz import Quiz
 from ..schemas.quiz import QuizCreate, QuizUpdate, QuizOut, QuizItem
-
-
 load_dotenv()
 OPENAI_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_KEY:
@@ -21,7 +18,6 @@ openai.api_key = OPENAI_KEY
 
 
 router = APIRouter(prefix="/api/quiz", tags=["quiz"])
-
 
 STATIC_TEMPLATES = [
     ("What region is the {name} culture from?", "region"),

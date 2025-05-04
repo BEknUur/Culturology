@@ -59,11 +59,21 @@ export const generateQuiz = async (
   return data;
 };
 
-export const chatWithAI = async (
+export const chatWithCulture = async (
   slug: string,
   question: string
 ): Promise<string> => {
   const { data } = await api.post<{ answer: string }>(`/api/chat/${slug}`, {
+    question,
+  });
+  return data.answer;
+};
+
+// задаём общий вопрос
+export const chatGeneral = async (
+  question: string
+): Promise<string> => {
+  const { data } = await api.post<{ answer: string }>(`/api/chat/`, {
     question,
   });
   return data.answer;

@@ -7,7 +7,6 @@ import { Culture, Quiz } from "@/types";
 import Gallery from "@/components/Gallery";
 
 const tabs = ["About", "Traditions", "Lifestyle"] as const;
-
 const CultureDetail = () => {
   const { isLoaded, isSignedIn } = useUser();
   const { slug } = useParams<{ slug: string }>();
