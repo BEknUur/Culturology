@@ -10,36 +10,41 @@ from ..models.culture_image import CultureImage
 from ..schemas.culture import CultureCreate, CultureUpdate, CultureOut
 
 router = APIRouter()
-# ---- поиск ----------------------------------------------------
+
 @router.get("/search", response_model=list[CultureOut])
 def search_cultures(
-    query: str | None = Query(None),
-    region: str | None = Query(None),
-    skip: int = 0,
-    limit: int = 12,
+    query: str = Query(..., min_length=1, description="Search term for name or slug"),
+    region: str | None = Query(None, description="Filter by region"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1),
     db: Session = Depends(get_db),
 ):
     q = db.query(Culture)
+
+   
     if query:
+        term = f"%{query.lower()}%"
         q = q.filter(
             or_(
-                Culture.name.ilike(f"%{query}%"),
-                Culture.location.ilike(f"%{query}%"),
-                Culture.language.ilike(f"%{query}%"),
+                Culture.name.ilike(term),
+                Culture.slug.ilike(term)
             )
         )
+
+    
     if region:
-        q = q.filter(Culture.region.ilike(f"%{region}%"))
-    return q.offset(skip).limit(limit).all()
+        reg = f"%{region.lower()}%"
+        q = q.filter(Culture.region.ilike(reg))
+
+    results = q.offset(skip).limit(limit).all()
+    return results
 
 
 
-# helpers
 def create_images(db: Session, culture: Culture, images):
     for img in images:
         db.add(CultureImage(culture_id=culture.id, **img.dict()))
 
-# ---------- CREATE ----------
 @router.post("/", response_model=CultureOut, status_code=status.HTTP_201_CREATED)
 def create_culture(payload: CultureCreate, db: Session = Depends(get_db)):
     if db.query(Culture).filter(Culture.slug == payload.slug).first():

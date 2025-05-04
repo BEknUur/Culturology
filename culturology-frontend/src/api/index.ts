@@ -3,18 +3,12 @@ import axios from "axios";
 import type { Culture } from "@/types/culture";
 import type { Quiz } from "@/types/quiz";
 
-
-
-/**
- * Единый axios‑экземпляр.
- * Базовый URL берём из .env: VITE_API_URL=http://localhost:8000
- */
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: false,      // если не нужны куки
+  baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:8000", 
+  // теперь api.get("/api/cultures") → http://localhost:8000/api/cultures
 });
 
-// ---------- C U L T U R E S ----------
+// ---------- CULTURES ----------
 export const getCultures = async (): Promise<Culture[]> => {
   const { data } = await api.get<Culture[]>("/api/cultures");
   return data;
@@ -36,7 +30,7 @@ export const getCultureBySlug = async (slug: string): Promise<Culture> => {
   return data;
 };
 
-// ---------- M A P  P O I N T S ----------
+// ---------- MAP POINTS ----------
 export interface Point {
   slug: string;
   name: string;
@@ -48,7 +42,7 @@ export const getMapPoints = async (): Promise<Point[]> => {
   return data;
 };
 
-// ---------- Q U I Z ----------
+// ---------- QUIZ ----------
 export const getQuizByCulture = async (
   cultureId: number
 ): Promise<Quiz[]> => {
@@ -58,7 +52,7 @@ export const getQuizByCulture = async (
   return data;
 };
 
-// ---------- C H A T  B O T ----------
+// ---------- CHAT BOT ----------
 export const chatWithAI = async (
   slug: string,
   question: string
