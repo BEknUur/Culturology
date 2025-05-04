@@ -1,18 +1,16 @@
-// tsconfig.json (в корне проекта)
 {
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
     "moduleResolution": "node",
-    "jsx": "react-jsx",
+    "jsx": "react-jsx", 
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-
-   
+    "types": ["vite/client", "react", "react-dom"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]

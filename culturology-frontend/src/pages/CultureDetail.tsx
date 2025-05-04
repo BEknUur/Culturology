@@ -1,5 +1,8 @@
+// src/pages/CultureDetail.tsx
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
+
 import { getCultureBySlug, getQuizByCulture } from "@/api";
 import { Culture, Quiz } from "@/types";
 import Gallery from "@/components/Gallery";
@@ -9,10 +12,16 @@ import QuizComponent from "@/components/Quiz";
 const tabs = ["About", "Traditions", "Lifestyle"] as const;
 
 const CultureDetail = () => {
+  const { isLoaded, isSignedIn } = useUser();
   const { slug } = useParams<{ slug: string }>();
   const [culture, setCulture] = useState<Culture | null>(null);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>("About");
+
+  // 1) Ждём, пока Clerk загрузит статус
+  if (!isLoaded) return null;
+  // 2) Если не залогинен — редирект
+  if (!isSignedIn) return <Navigate to="/signin" replace />;
 
   useEffect(() => {
     if (!slug) return;
@@ -45,7 +54,9 @@ const CultureDetail = () => {
             key={t}
             onClick={() => setActiveTab(t)}
             className={`mr-4 border-b-2 px-2 pb-2 text-lg font-medium ${
-              activeTab === t ? "border-primary-500" : "border-transparent text-gray-500"
+              activeTab === t
+                ? "border-primary-500"
+                : "border-transparent text-gray-500"
             }`}
           >
             {t}
@@ -54,7 +65,10 @@ const CultureDetail = () => {
       </div>
 
       {/* Content */}
-      <div className="prose dark:prose-invert" dangerouslySetInnerHTML={{ __html: tabContent ?? "" }} />
+      <div
+        className="prose dark:prose-invert"
+        dangerouslySetInnerHTML={{ __html: tabContent ?? "" }}
+      />
 
       {/* Chatbot */}
       <Chatbot slug={culture.slug} />
@@ -64,4 +78,5 @@ const CultureDetail = () => {
     </article>
   );
 };
+
 export default CultureDetail;

@@ -1,11 +1,21 @@
+// tailwind.config.js
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
+  darkMode: 'class',   // включаем переключение по классу
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: {
+          50:  '#f0faff',
+          500: '#0ea5e9',
+          900: '#082f49',
+        },
+      },
+    },
   },
   plugins: [],
-}
+};
