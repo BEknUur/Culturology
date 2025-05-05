@@ -48,10 +48,10 @@ export default function Home() {
           </Link>
 
           <Link
-            to="/gallery"
+            to="/media"
             className="group relative inline-block overflow-hidden rounded-lg border border-amber-500 px-8 py-4 text-lg font-semibold text-amber-100 shadow transition-shadow hover:shadow-xl"
           >
-            <span className="relative z-10">View Gallery</span>
+            <span className="relative z-10">View Media</span>
             <span className="absolute inset-0 -translate-x-full bg-stone-800 transition-transform group-hover:translate-x-0" />
           </Link>
         </div>
