@@ -4,11 +4,18 @@ import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 const Navbar = () => {
   const { isSignedIn, isLoaded } = useUser();
 
+  const links = [
+    { to: "/cultures", label: "Cultures" },
+    { to: "/map",      label: "Map" },
+    {to: "/media",    label: "Media" },
+    
+  ];
+
   return (
     <nav className="fixed top-0 z-50 w-full bg-transparent">
       <div className="mx-auto flex max-w-6xl items-center justify-between p-4">
         <NavLink to="/" className="relative flex items-center text-2xl font-bold">
-          <div className="mr-3 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-amber-600">
+          <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-amber-600">
             <div className="h-6 w-6 rounded-full bg-stone-900 p-1">
               <div className="h-full w-full rounded-full bg-amber-400"></div>
             </div>
@@ -17,24 +24,21 @@ const Navbar = () => {
         </NavLink>
 
         <div className="flex items-center space-x-6">
-          {["/cultures", "/map", "/gallery",].map((path, i) => {
-            const label = path.slice(1).charAt(0).toUpperCase() + path.slice(2);
-            return (
-              <NavLink
-                key={path}
-                to={path}
-                className={({ isActive }) =>
-                  `font-serif text-lg transition-colors ${
-                    isActive ? "text-amber-400 underline" : "text-amber-100/80 hover:text-amber-200"
-                  }`
-                }
-              >
-                {label}
-              </NavLink>
-              
-            );
-            
-          })}
+          {links.map(({ to, label }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                `font-serif text-lg transition-colors ${
+                  isActive
+                    ? "text-amber-400 underline"
+                    : "text-amber-100/80 hover:text-amber-200"
+                }`
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
 
           {isLoaded ? (
             isSignedIn ? (
@@ -52,7 +56,6 @@ const Navbar = () => {
             <div className="h-8 w-8 animate-pulse rounded-full bg-amber-700/50" />
           )}
         </div>
-        
       </div>
     </nav>
   );

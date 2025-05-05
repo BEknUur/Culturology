@@ -96,7 +96,7 @@ const CultureDetail = () => {
 
         
         <div className="rounded-2xl overflow-hidden border-4 border-amber-500 shadow-2xl transform hover:scale-[1.01] transition-transform duration-300">
-          <Gallery images={culture.gallery} />
+          <Gallery images={culture.gallery.map(image => ({ ...image, type: "image" }))} />
         </div>
 
         

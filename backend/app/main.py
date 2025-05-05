@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .database.session import engine, Base
-from .routes import cultures, quiz,  chat
+from .routes import cultures, quiz,  chat,media
 
 app = FastAPI(
     title="Culturology API",
@@ -26,4 +26,5 @@ Base.metadata.create_all(bind=engine)
 app.include_router(cultures.router, prefix="/api/cultures", tags=["cultures"])
 app.include_router(quiz.router)
 app.include_router(chat.router)
+app.include_router(media.router) 
 

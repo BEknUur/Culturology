@@ -1,16 +1,22 @@
+// src/App.tsx
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
 import Home from "@/pages/Home";
 import Cultures from "@/pages/Cultures";
 import CultureDetail from "@/pages/CultureDetail";
 import MapPage from "@/pages/MapPage";
+
 import SignInPage from "@/pages/SignIn";
 import SignUpPage from "@/pages/SignUp";
 import QuizPage from "@/pages/QuizPage";
 import ChatbotPanel from "@/components/ChatbotPanel";
+import MediaPage from "@/pages/MediaPage";
+
 import { ChatBubbleLeftRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 function AppWrapper() {
@@ -18,6 +24,7 @@ function AppWrapper() {
   const [chatOpen, setChatOpen] = useState(false);
   const location = useLocation();
 
+  // вытаскиваем slug на деталке культуры
   const slug =
     location.pathname.startsWith("/cultures/")
       ? location.pathname.split("/")[2]
@@ -32,23 +39,34 @@ function AppWrapper() {
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+
           <Route path="/cultures" element={<Cultures />} />
           <Route path="/cultures/:slug" element={<CultureDetail />} />
           <Route path="/map" element={<MapPage />} />
+
+          <Route path="/media" element={<MediaPage />} />
           <Route path="/quizzes/:slug" element={<QuizPage />} />
+
           <Route path="*" element={<Home />} />
         </Routes>
       </div>
 
       <Footer />
+
       {isLoaded && isSignedIn && (
         <button
           onClick={() => setChatOpen((o) => !o)}
-          className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-amber-600 shadow-lg hover:bg-amber-500 transition-colors"
+          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-xl bg-amber-600 p-3 shadow-lg hover:bg-amber-500 transition-colors"
+          aria-label={chatOpen ? "Close chat" : "Open chat"}
         >
-          
+          {chatOpen ? (
+            <XMarkIcon className="h-6 w-6 text-amber-100" />
+          ) : (
+            <ChatBubbleLeftRightIcon className="h-6 w-6 text-amber-100" />
+          )}
         </button>
       )}
+
       {isLoaded && isSignedIn && chatOpen && (
         <ChatbotPanel slug={slug} onClose={() => setChatOpen(false)} />
       )}

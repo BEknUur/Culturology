@@ -58,7 +58,7 @@ const Footer = () => {
                 <Link to="/map" className="hover:text-amber-300">Cultural Map</Link>
               </li>
               <li>
-                <Link to="/gallery" className="hover:text-amber-300">Photo Gallery</Link>
+                <Link to="/media" className="hover:text-amber-300">Media</Link>
               </li>
               <li>
                 <Link to="/about" className="hover:text-amber-300">About Us</Link>
