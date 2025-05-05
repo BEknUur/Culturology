@@ -24,12 +24,12 @@ const Cultures: React.FC = () => {
         : await getCultures();
 
       if (!Array.isArray(data)) {
-        throw new Error("Неверный формат данных от сервера");
+        throw new Error("Invalid data format from server");
       }
 
       setCultures(data);
     } catch (err: any) {
-      setError(err.message ?? "Ошибка при загрузке культур");
+      setError(err.message ?? "Error loading cultures");
       setCultures([]);
     } finally {
       setLoading(false);
@@ -46,7 +46,11 @@ const Cultures: React.FC = () => {
   if (!isSignedIn) return <Navigate to="/signin" replace />;
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-amber-900 to-stone-900 pt-24 pb-12">
+    <div className="relative min-h-screen bg-gradient-to-b from-amber-50 to-amber-100 pt-24 pb-12 font-['Cormorant']"
+      style={{
+        backgroundImage: "url('/assets/parchment-texture.png')",
+        backgroundBlendMode: "overlay"
+      }}>
       <div className="container mx-auto max-w-6xl px-4 space-y-8">
         {/* Header Section */}
         <motion.div 
@@ -55,17 +59,18 @@ const Cultures: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl font-bold text-amber-100 md:text-5xl font-serif">
-            World's <span className="text-amber-400">Indigenous Cultures</span>
+          <h1 className="text-4xl font-bold text-amber-900 md:text-5xl">
+            <span className="block">Sacred Wisdom of</span>
+            <span className="text-amber-700">Ancient Cultures</span>
           </h1>
-          <p className="mt-4 text-lg text-amber-100/80 max-w-2xl mx-auto leading-relaxed">
-            Explore the diversity of indigenous traditions and communities from around the globe
+          <p className="mt-4 text-lg text-amber-800/90 max-w-2xl mx-auto leading-relaxed italic">
+            "Explore the diversity of traditions and communities from our ancestors"
           </p>
         </motion.div>
 
         {/* Search Bar Section */}
         <motion.div
-          className="bg-gradient-to-r from-amber-800/90 to-amber-600/90 rounded-xl p-6 shadow-lg border border-amber-500/30 backdrop-blur-sm max-w-3xl mx-auto"
+          className="bg-white/30 backdrop-blur-sm rounded-xl p-6 shadow-lg border-2 border-amber-200 max-w-3xl mx-auto"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
@@ -82,20 +87,20 @@ const Cultures: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <div className="inline-block h-12 w-12 rounded-full border-4 border-amber-500 border-t-transparent animate-spin mb-4"></div>
-              <p className="text-amber-100 text-lg">Loading cultures...</p>
+              <div className="inline-block h-12 w-12 rounded-full border-4 border-amber-600 border-t-transparent animate-spin mb-4"></div>
+              <p className="text-amber-800 text-lg italic">Consulting the ancient archives...</p>
             </motion.div>
           ) : error ? (
             <motion.div 
-              className="text-center py-12 bg-stone-900/60 backdrop-blur-sm rounded-xl p-8 border border-amber-900/30 max-w-2xl mx-auto"
+              className="text-center py-12 bg-white/30 backdrop-blur-sm rounded-xl p-8 border-2 border-amber-200 max-w-2xl mx-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
               <div className="mb-6">
-                <svg className="w-16 h-16 text-amber-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-16 h-16 text-amber-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <p className="text-amber-100 mt-4 text-lg">{error}</p>
+                <p className="text-amber-800 mt-4 text-lg">{error}</p>
               </div>
               <button
                 onClick={loadCultures}
@@ -118,14 +123,14 @@ const Cultures: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-900/50 mb-4">
-                <svg className="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-200/50 mb-4">
+                <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl text-amber-100 mb-2">No cultures found</h3>
-              <p className="text-amber-100/80 max-w-md mx-auto">
-                Try adjusting your search or filter criteria
+              <h3 className="text-xl text-amber-800 mb-2">No cultures found</h3>
+              <p className="text-amber-800/80 max-w-md mx-auto italic">
+                The scrolls are silent... Try different search terms
               </p>
             </motion.div>
           ) : (
@@ -151,12 +156,12 @@ const Cultures: React.FC = () => {
         </div>
       </div>
 
-      {/* Floating decorative elements */}
+      
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute border border-amber-800/20 rounded-full"
+            className="absolute border border-amber-300/20 rounded-full"
             style={{
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,

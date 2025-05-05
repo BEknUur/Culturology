@@ -43,15 +43,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onRegionChange }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      {/* Search Input */}
+      
       <motion.div 
         className="relative flex-1"
         whileHover={{ scale: 1.01 }}
-        whileFocus={{ scale: 1.01 }}
       >
         <input
           type="text"
-          placeholder="Search cultures..."
+          placeholder="Search ancient cultures..."
           value={searchQuery}
           onChange={handleSearchChange}
           className="
@@ -59,11 +58,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onRegionChange }) => {
             rounded-xl
             px-5 py-3
             border-2 border-amber-400/70
-            bg-stone-50 text-stone-900 placeholder-stone-500
+            bg-white text-amber-900 placeholder-amber-600/70
             focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
             transition-all duration-200
             shadow-lg
             pr-10
+            font-['Cormorant'] text-lg
           "
         />
         <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-600">
@@ -87,13 +87,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onRegionChange }) => {
             rounded-xl
             px-5 py-3
             border-2 border-amber-400/70
-            bg-stone-50 text-stone-900
+            bg-white text-amber-900
             focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
             transition-all duration-200
             shadow-lg
             appearance-none
             cursor-pointer
             disabled:opacity-70
+            font-['Cormorant'] text-lg
           "
         >
           <option value="">All regions</option>

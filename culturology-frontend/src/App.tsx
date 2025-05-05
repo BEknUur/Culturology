@@ -78,7 +78,7 @@ function AppWrapper() {
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-900 to-stone-900 text-amber-100">
+    <div className="">
       <BrowserRouter>
         <AppWrapper />
       </BrowserRouter>
