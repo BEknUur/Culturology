@@ -5,7 +5,6 @@ import type { QuizItem } from "@/types/quiz";
 interface QuizComponentProps {
   quizzes: QuizItem[];
 }
-
 const QuizComponent: React.FC<QuizComponentProps> = ({ quizzes }) => {
  
   const [answers, setAnswers] = useState<Record<number, string>>({});

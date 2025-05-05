@@ -1,4 +1,4 @@
-// src/App.tsx
+
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
@@ -16,6 +16,7 @@ import SignUpPage from "@/pages/SignUp";
 import QuizPage from "@/pages/QuizPage";
 import ChatbotPanel from "@/components/ChatbotPanel";
 import MediaPage from "@/pages/MediaPage";
+import About from "@/pages/About";
 
 import { ChatBubbleLeftRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
@@ -24,7 +25,7 @@ function AppWrapper() {
   const [chatOpen, setChatOpen] = useState(false);
   const location = useLocation();
 
-  // вытаскиваем slug на деталке культуры
+  
   const slug =
     location.pathname.startsWith("/cultures/")
       ? location.pathname.split("/")[2]
@@ -46,6 +47,7 @@ function AppWrapper() {
 
           <Route path="/media" element={<MediaPage />} />
           <Route path="/quizzes/:slug" element={<QuizPage />} />
+          <Route path="/about" element={<About />} />
 
           <Route path="*" element={<Home />} />
         </Routes>

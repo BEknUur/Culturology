@@ -67,7 +67,7 @@ const MapPage: React.FC = () => {
     polygonSeries.mapPolygons.template.adapters.add("fill", (fill, target) => {
       const country = (target.dataItem?.dataContext as { name?: string })?.name;
       if (country && highlightedCountries.includes(country)) {
-        return am5.color(0x3366ff);
+        return am5.color(0x66ff33);
       }
       return fill;
     });

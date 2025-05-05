@@ -17,7 +17,7 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ slug, onClose }) => {
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // автоскролл вниз
+  
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -67,7 +67,7 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ slug, onClose }) => {
         ring-1 ring-amber-600/40
       "
     >
-      {/* Шапка */}
+    
       <div
         className="
           flex items-center justify-between
@@ -105,7 +105,7 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ slug, onClose }) => {
         </button>
       </div>
 
-      {/* Лента сообщений */}
+      
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-3">
         {messages.map((m, i) => (
           <div
@@ -131,7 +131,7 @@ const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ slug, onClose }) => {
         <div ref={bottomRef} />
       </div>
 
-      {/* Поле ввода */}
+     
       <div className="px-3 py-2 border-t border-amber-500 flex items-center gap-2 bg-white/10">
         <textarea
           value={input}

@@ -8,7 +8,7 @@ const Navbar = () => {
     { to: "/cultures", label: "Cultures" },
     { to: "/map",      label: "Map" },
     {to: "/media",    label: "Media" },
-    
+    { to: "/about",     label: "About" },
   ];
 
   return (
