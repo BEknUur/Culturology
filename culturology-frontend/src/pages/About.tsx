@@ -24,9 +24,8 @@ const About: React.FC = () => {
           </div>
           <h2 className="text-3xl font-semibold text-amber-200">Бекнур У.</h2>
           <p className="text-amber-100/80">
-          Hi! I’m Beknur, a full-stack developer and the creator of this project. 
-          I wanted to share the stories of different cultures through firsthand accounts and multimedia. 
-          Here, you’ll find traditions, quizzes, and a handy AI assistant to chat with.
+          Hey! I'm Beknur, a full-stack dev.
+          Built this project—stories, traditions, and an AI assistant to explore cultures. Wanna get into an incubator for a grant 'cause this shit is fire, and I put my soul into it. That's it
           </p>
           <p className="text-amber-100/80">
           Thanks for stopping by! I hope Culturology brings you new knowledge and warm feelings.
