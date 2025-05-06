@@ -1,16 +1,13 @@
-import { useEffect, useState, useRef } from "react";
-import { useUser } from "@clerk/clerk-react";
-import { Navigate } from "react-router-dom";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5map from "@amcharts/amcharts5/map";
 import am5geodata_worldLow from "@amcharts/amcharts5-geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { getCultures } from "@/api";
-import type { Culture } from "@/types/culture";
 
 const LoadingSpinner = () => (
-  <motion.div 
+  <motion.div
     className="flex flex-col items-center justify-center h-full"
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
@@ -21,7 +18,7 @@ const LoadingSpinner = () => (
       animate={{ rotate: 360 }}
       transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
     />
-    <motion.p 
+    <motion.p
       className="mt-4 text-xl text-amber-800 font-['Cormorant'] italic"
       animate={{ opacity: [0.6, 1, 0.6] }}
       transition={{ duration: 2, repeat: Infinity }}
@@ -31,8 +28,27 @@ const LoadingSpinner = () => (
   </motion.div>
 );
 
+const COLORS = {
+  ancient: {
+    background: 0xF5F5DC,
+    text: 0x5C4033,
+    primary: 0x8B5A2B,
+    secondary: 0xC4A484,
+    mapFill: 0xE6D5B8,
+    mapStroke: 0xC4A484
+  },
+  standard: {
+    background: 0xF8F8F8,
+    text: 0x333333,
+    primary: 0x4682B4,
+    secondary: 0xCCCCCC,
+    mapFill: 0xE8E8E8,
+    mapStroke: 0xCCCCCC
+  }
+};
+
 const MapPage: React.FC = () => {
-  const { isLoaded, isSignedIn } = useUser();
+ 
   const chartRef = useRef<am5.Root | null>(null);
   const [highlightedCountries, setHighlightedCountries] = useState<string[]>([]);
   const [countryToCultures, setCountryToCultures] = useState<Record<string, { name: string; count: number }[]>>({});
@@ -42,47 +58,86 @@ const MapPage: React.FC = () => {
   const [isExploring, setIsExploring] = useState(false);
   const controls = useAnimation();
 
-  useEffect(() => {
-    const animateBackground = async () => {
-      while (true) {
-        await controls.start({
-          backgroundPosition: ["0% 0%", "100% 100%"],
-          transition: { duration: 60, ease: "linear" }
-        });
-        await controls.start({
-          backgroundPosition: ["100% 100%", "0% 0%"],
-          transition: { duration: 60, ease: "linear" }
-        });
-      }
-    };
-    animateBackground();
+  const animateBackground = useCallback(async () => {
+    while (true) {
+      await controls.start({
+        backgroundPosition: ["0% 0%", "100% 100%"],
+        transition: { duration: 60, ease: "linear" }
+      });
+      await controls.start({
+        backgroundPosition: ["100% 100%", "0% 0%"],
+        transition: { duration: 60, ease: "linear" }
+      });
+    }
   }, [controls]);
 
-  useEffect(() => {
+  const loadCulturesData = useCallback(async () => {
     setIsLoading(true);
-    getCultures()
-      .then((data: Culture[]) => {
-        const map: Record<string, { name: string; count: number }[]> = {};
-        data.forEach((c) => {
-          const countryName = c.location?.split(",")[0].trim();
-          if (!countryName) return;
-          if (!map[countryName]) map[countryName] = [];
-          const existingCulture = map[countryName].find(item => item.name === c.name);
-          if (existingCulture) existingCulture.count += 1;
-          else map[countryName].push({ name: c.name, count: 1 });
-        });
-        setHighlightedCountries(Object.keys(map));
-        setCountryToCultures(map);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Failed to load cultures:", error);
-        setIsLoading(false);
+    try {
+      const data = await getCultures();
+      const map: Record<string, { name: string; count: number }[]> = {};
+
+      data.forEach((c) => {
+        const countryName = c.location?.split(",")[0].trim();
+        if (!countryName) return;
+
+        if (!map[countryName]) map[countryName] = [];
+        const existingCulture = map[countryName].find(item => item.name === c.name);
+
+        if (existingCulture) {
+          existingCulture.count += 1;
+        } else {
+          map[countryName].push({ name: c.name, count: 1 });
+        }
       });
+
+      setHighlightedCountries(Object.keys(map));
+      setCountryToCultures(map);
+    } catch (error) {
+      console.error("Failed to load cultures:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const startExploration = useCallback(() => {
+    setIsExploring(true);
+    setTimeout(() => {
+      if (chartRef.current) {
+        const chart = chartRef.current.container.children.getIndex(0) as am5map.MapChart;
+        chart.animate({
+          key: "rotationX",
+          to: 360,
+          duration: 30000,
+          loops: Infinity,
+          easing: am5.ease.linear
+        });
+      }
+    }, 1000);
+  }, []);
+
+  const stopExploration = useCallback(() => {
+    setIsExploring(false);
+    if (chartRef.current) {
+      const chart = chartRef.current.container.children.getIndex(0) as am5map.MapChart;
+      chart.goHome();
+    }
   }, []);
 
   useEffect(() => {
+    animateBackground();
+    return () => {
+      controls.stop();
+    };
+  }, [animateBackground, controls]);
+
+  useEffect(() => {
+    loadCulturesData();
+  }, [loadCulturesData]);
+
+  useEffect(() => {
     if (isLoading) return;
+
     if (chartRef.current) {
       chartRef.current.dispose();
       chartRef.current = null;
@@ -92,14 +147,9 @@ const MapPage: React.FC = () => {
     chartRef.current = root;
     root.setThemes([am5themes_Animated.new(root)]);
 
-    
-    if (viewMode === "ancient") {
-      root.interfaceColors.set("background", am5.color(0xF5F5DC));
-      root.interfaceColors.set("text", am5.color(0x5C4033));
-    } else {
-      root.interfaceColors.set("background", am5.color(0xF8F8F8));
-      root.interfaceColors.set("text", am5.color(0x333333));
-    }
+    const currentColors = COLORS[viewMode];
+    root.interfaceColors.set("background", am5.color(currentColors.background));
+    root.interfaceColors.set("text", am5.color(currentColors.text));
 
     const chart = root.container.children.push(
       am5map.MapChart.new(root, {
@@ -113,7 +163,6 @@ const MapPage: React.FC = () => {
       })
     );
 
-    
     const zoomControl = am5map.ZoomControl.new(root, {
       marginBottom: 15,
       marginRight: 15,
@@ -122,7 +171,7 @@ const MapPage: React.FC = () => {
       paddingLeft: 10,
       paddingRight: 10,
       background: am5.RoundedRectangle.new(root, {
-        fill: am5.color(viewMode === "ancient" ? 0x8B5A2B : 0x4682B4),
+        fill: am5.color(currentColors.primary),
         fillOpacity: 0.8,
         stroke: am5.color(0xFFFFFF),
         strokeWidth: 1,
@@ -134,7 +183,6 @@ const MapPage: React.FC = () => {
     });
     chart.set("zoomControl", zoomControl);
 
-    // Add home button
     const homeButton = chart.children.push(am5.Button.new(root, {
       x: am5.percent(100),
       y: am5.percent(100),
@@ -147,7 +195,7 @@ const MapPage: React.FC = () => {
       paddingLeft: 0,
       paddingRight: 0,
       background: am5.RoundedRectangle.new(root, {
-        fill: am5.color(viewMode === "ancient" ? 0x8B5A2B : 0x4682B4),
+        fill: am5.color(currentColors.primary),
         fillOpacity: 0.8,
         stroke: am5.color(0xFFFFFF),
         strokeWidth: 1,
@@ -163,7 +211,7 @@ const MapPage: React.FC = () => {
         svgPath: "M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"
       })
     }));
-    
+
     homeButton.events.on("click", () => {
       chart.goHome();
     });
@@ -175,23 +223,22 @@ const MapPage: React.FC = () => {
       })
     );
 
-   
     polygonSeries.mapPolygons.template.setAll({
-      fill: viewMode === "ancient" ? am5.color(0xE6D5B8) : am5.color(0xE8E8E8),
-      stroke: viewMode === "ancient" ? am5.color(0xC4A484) : am5.color(0xCCCCCC),
+      fill: am5.color(currentColors.mapFill),
+      stroke: am5.color(currentColors.mapStroke),
       strokeWidth: 0.5,
       tooltipText: "{name}",
       interactive: true,
     });
 
     polygonSeries.mapPolygons.template.states.create("hover", {
-      fill: viewMode === "ancient" ? am5.color(0xB88A57) : am5.color(0xADD8E6),
-      stroke: viewMode === "ancient" ? am5.color(0x8B5A2B) : am5.color(0x4682B4),
+      fill: am5.color(viewMode === "ancient" ? 0xB88A57 : 0xADD8E6),
+      stroke: am5.color(currentColors.primary),
       strokeWidth: 1,
     });
 
     polygonSeries.mapPolygons.template.states.create("active", {
-      fill: viewMode === "ancient" ? am5.color(0x8B5A2B) : am5.color(0x4682B4),
+      fill: am5.color(currentColors.primary),
     });
 
     polygonSeries.mapPolygons.template.adapters.add("fill", (fill, target) => {
@@ -199,16 +246,16 @@ const MapPage: React.FC = () => {
       if (countryName && highlightedCountries.includes(countryName)) {
         const culturesCount = countryToCultures[countryName]?.reduce((sum, c) => sum + c.count, 0) || 0;
         const intensity = Math.min(0.3 + (culturesCount / 10) * 0.7, 1);
-        
+
         if (viewMode === "ancient") {
-          const baseR = 139, baseG = 69, baseB = 19; // SaddleBrown
+          const baseR = 139, baseG = 69, baseB = 19;
           const finalR = Math.round(baseR * intensity);
           const finalG = Math.round(baseG * intensity);
           const finalB = Math.round(baseB * intensity);
           const hexColor = (finalR << 16) | (finalG << 8) | finalB;
           return am5.color(hexColor);
         } else {
-          const hue = 200 - (intensity * 40); 
+          const hue = 200 - (intensity * 40);
           const saturation = 80 + (intensity * 20);
           const lightness = 90 - (intensity * 30);
           const hslToHex = (h: number, s: number, l: number) => {
@@ -233,7 +280,7 @@ const MapPage: React.FC = () => {
         const cultures = countryToCultures[countryName];
         const total = cultures.reduce((sum, c) => sum + c.count, 0);
         let tooltip = `[bold font-size: 18px]${countryName}[/]\n`;
-        tooltip += `[font-size: 14px]Sacred traditions: [bold]${total}[/][/]\n[stroke: ${viewMode === "ancient" ? "#8B5A2B" : "#4682B4"}]━━━━━━━━━━[/]\n`;
+        tooltip += `[font-size: 14px]Sacred traditions: [bold]${total}[/][/]\n[stroke: #${currentColors.primary.toString(16).padStart(6, '0')}]━━━━━━━━━━[/]\n`;
         tooltip += cultures.map(c => `[bullet] ${c.name}${c.count > 1 ? ` (×[bold]${c.count}[/])` : ''}`).join("\n");
         return tooltip;
       }
@@ -244,21 +291,16 @@ const MapPage: React.FC = () => {
       const countryName = (ev.target.dataItem?.dataContext as { name?: string })?.name;
       if (countryName) {
         setSelectedCountry(countryName);
-       
-       
       }
     });
 
-    
-    const pointSeries = chart.series.push(
-      am5map.MapPointSeries.new(root, {})
-    );
+    const pointSeries = chart.series.push(am5map.MapPointSeries.new(root, {}));
 
     pointSeries.bullets.push(() => {
       const container = am5.Container.new(root, {});
-      
-      const icon = container.children.push(am5.Graphics.new(root, {
-        fill: viewMode === "ancient" ? am5.color(0x8B5A2B) : am5.color(0x4682B4),
+
+      container.children.push(am5.Graphics.new(root, {
+        fill: am5.color(currentColors.primary),
         svgPath: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
         scale: 0.7
       }));
@@ -266,7 +308,7 @@ const MapPage: React.FC = () => {
       const circle = container.children.push(am5.Circle.new(root, {
         radius: 5,
         fill: am5.color(0xFFFFFF),
-        stroke: viewMode === "ancient" ? am5.color(0x8B5A2B) : am5.color(0x4682B4),
+        stroke: am5.color(currentColors.primary),
         strokeWidth: 2
       }));
 
@@ -290,7 +332,6 @@ const MapPage: React.FC = () => {
       });
     });
 
-   
     Object.entries(countryToCultures).forEach(([country, cultures]) => {
       let polygon: am5map.MapPolygon | undefined;
       polygonSeries.mapPolygons.each((item) => {
@@ -312,52 +353,32 @@ const MapPage: React.FC = () => {
       }
     });
 
-    
     chart.appear(1000, 100);
+
     return () => {
       if (chartRef.current) {
         chartRef.current.dispose();
         chartRef.current = null;
       }
     };
-  }, [isLoading, highlightedCountries, countryToCultures, viewMode]);
+  }, [isLoading, highlightedCountries, countryToCultures, viewMode, loadCulturesData]); // Added loadCulturesData dependency
 
-  const startExploration = () => {
-    setIsExploring(true);
-    setTimeout(() => {
-      if (chartRef.current) {
-        const chart = chartRef.current.container.children.getIndex(0) as am5map.MapChart;
-        chart.animate({
-          key: "rotationX",
-          to: 360,
-          duration: 30000,
-          loops: Infinity,
-          easing: am5.ease.linear
-        });
-      }
-    }, 1000);
-  };
+  
 
-  const stopExploration = () => {
-    setIsExploring(false);
-    if (chartRef.current) {
-      const chart = chartRef.current.container.children.getIndex(0) as am5map.MapChart;
-      chart.goHome();
-    }
-  };
+  const currentColors = COLORS[viewMode];
+  const bgStyle = viewMode === "ancient"
+    ? "url('/assets/parchment-texture.png'), linear-gradient(135deg, #F5F5DC 0%, #E6D5B8 100%)"
+    : "url('/assets/subtle-pattern.png'), linear-gradient(135deg, #F8F8F8 0%, #E8E8E8 100%)";
 
   return (
-    <motion.div 
+    <motion.div
       className="relative min-h-screen overflow-hidden font-['Cormorant']"
       style={{
-        backgroundImage: viewMode === "ancient" ? 
-          "url('/assets/parchment-texture.png'), linear-gradient(135deg, #F5F5DC 0%, #E6D5B8 100%)" :
-          "url('/assets/subtle-pattern.png'), linear-gradient(135deg, #F8F8F8 0%, #E8E8E8 100%)",
+        backgroundImage: bgStyle,
         backgroundBlendMode: "overlay"
       }}
       animate={controls}
     >
-      
       <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-10">
         {[...Array(8)].map((_, i) => (
           <motion.div
@@ -367,7 +388,7 @@ const MapPage: React.FC = () => {
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
               fontFamily: "'Noto Sans Symbols', sans-serif",
-              color: viewMode === "ancient" ? "#8B5A2B" : "#4682B4"
+              color: `#${currentColors.primary.toString(16).padStart(6, '0')}`
             }}
             animate={{
               rotate: [0, 360],
@@ -386,18 +407,15 @@ const MapPage: React.FC = () => {
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-12 sm:py-16">
-        {/* Header */}
-        <motion.div 
+        <motion.div
           className="mb-12 text-center"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <motion.h1 
+          <motion.h1
             className="text-5xl md:text-6xl font-bold mb-6"
-            style={{
-              color: viewMode === "ancient" ? "#5C4033" : "#333333"
-            }}
+            style={{ color: `#${currentColors.text.toString(16).padStart(6, '0')}` }}
             whileHover={{ scale: 1.02 }}
           >
             <span className="block">Ancient Cultural</span>
@@ -405,21 +423,17 @@ const MapPage: React.FC = () => {
               <span>World Map</span>
               <motion.span
                 className="absolute bottom-0 left-0 w-full h-1"
-                style={{
-                  backgroundColor: viewMode === "ancient" ? "#8B5A2B" : "#4682B4"
-                }}
+                style={{ backgroundColor: `#${currentColors.primary.toString(16).padStart(6, '0')}` }}
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 1, delay: 0.5 }}
               />
             </span>
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             className="text-xl max-w-2xl mx-auto leading-relaxed italic"
-            style={{
-              color: viewMode === "ancient" ? "rgba(92, 64, 51, 0.9)" : "rgba(51, 51, 51, 0.9)"
-            }}
+            style={{ color: `rgba(${(currentColors.text >> 16) & 0xFF}, ${(currentColors.text >> 8) & 0xFF}, ${currentColors.text & 0xFF}, 0.9)` }}
             animate={{ opacity: [0.8, 1, 0.8] }}
             transition={{ duration: 4, repeat: Infinity }}
           >
@@ -427,8 +441,7 @@ const MapPage: React.FC = () => {
           </motion.p>
         </motion.div>
 
-        {/* Controls */}
-        <motion.div 
+        <motion.div
           className="flex flex-wrap justify-center gap-4 mb-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -436,7 +449,7 @@ const MapPage: React.FC = () => {
         >
           <motion.button
             onClick={() => setViewMode("standard")}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${viewMode === "standard" ? 
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${viewMode === "standard" ?
               "bg-blue-500 text-white" : "bg-white text-blue-500 border border-blue-500"}`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -445,7 +458,7 @@ const MapPage: React.FC = () => {
           </motion.button>
           <motion.button
             onClick={() => setViewMode("ancient")}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${viewMode === "ancient" ? 
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${viewMode === "ancient" ?
               "bg-amber-700 text-white" : "bg-white text-amber-700 border border-amber-700"}`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -473,43 +486,24 @@ const MapPage: React.FC = () => {
           )}
         </motion.div>
 
-       
-        <motion.div 
+        <motion.div
           className="relative rounded-xl overflow-hidden shadow-2xl border-2"
           style={{
-            backgroundColor: viewMode === "ancient" ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.5)",
+            backgroundColor: `rgba(255, 255, 255, ${viewMode === "ancient" ? 0.3 : 0.5})`,
             backdropFilter: "blur(8px)",
-            borderColor: viewMode === "ancient" ? "#C4A484" : "#CCCCCC"
+            borderColor: `#${currentColors.secondary.toString(16).padStart(6, '0')}`
           }}
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
         >
-          
-          <div 
-            className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 rounded-tl-xl"
-            style={{
-              borderColor: viewMode === "ancient" ? "#8B5A2B" : "#4682B4"
-            }}
-          ></div>
-          <div 
-            className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 rounded-tr-xl"
-            style={{
-              borderColor: viewMode === "ancient" ? "#8B5A2B" : "#4682B4"
-            }}
-          ></div>
-          <div 
-            className="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 rounded-bl-xl"
-            style={{
-              borderColor: viewMode === "ancient" ? "#8B5A2B" : "#4682B4"
-            }}
-          ></div>
-          <div 
-            className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 rounded-br-xl"
-            style={{
-              borderColor: viewMode === "ancient" ? "#8B5A2B" : "#4682B4"
-            }}
-          ></div>
+          {[["top", "left"], ["top", "right"], ["bottom", "left"], ["bottom", "right"]].map(([vertical, horizontal]) => (
+            <div
+              key={`${vertical}-${horizontal}`}
+              className={`absolute ${vertical}-0 ${horizontal}-0 w-12 h-12 border-${vertical[0]}-2 border-${horizontal[0]}-2 rounded-${vertical[0]}${horizontal[0]}-xl`}
+              style={{ borderColor: `#${currentColors.primary.toString(16).padStart(6, '0')}` }}
+            />
+          ))}
 
           {isLoading ? (
             <div className="flex justify-center items-center h-[70vh] min-h-[500px]">
@@ -520,158 +514,38 @@ const MapPage: React.FC = () => {
           )}
         </motion.div>
 
-        
         <AnimatePresence>
           {selectedCountry && countryToCultures[selectedCountry] && (
-            <motion.div
-              className="mt-12 rounded-xl p-8 shadow-lg border-2 backdrop-blur-sm"
-              style={{
-                backgroundColor: viewMode === "ancient" ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.5)",
-                borderColor: viewMode === "ancient" ? "#C4A484" : "#CCCCCC"
-              }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.4 }}
-            >
-              <div className="flex justify-between items-center mb-8">
-                <div>
-                  <motion.h2 
-                    className="text-3xl md:text-4xl font-bold"
-                    style={{
-                      color: viewMode === "ancient" ? "#5C4033" : "#333333"
-                    }}
-                    whileHover={{ x: 5 }}
-                  >
-                    {selectedCountry}
-                  </motion.h2>
-                  <p 
-                    className="text-lg italic"
-                    style={{
-                      color: viewMode === "ancient" ? "rgba(92, 64, 51, 0.9)" : "rgba(51, 51, 51, 0.9)"
-                    }}
-                  >
-                    {countryToCultures[selectedCountry]?.reduce((sum, c) => sum + c.count, 0)} sacred traditions
-                  </p>
-                </div>
-                <motion.button
-                  onClick={() => setSelectedCountry(null)}
-                  className="p-2 rounded-full hover:bg-opacity-20 transition-all"
-                  style={{
-                    color: viewMode === "ancient" ? "#8B5A2B" : "#4682B4",
-                    backgroundColor: viewMode === "ancient" ? "rgba(139, 69, 19, 0.1)" : "rgba(70, 130, 180, 0.1)"
-                  }}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </motion.button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {countryToCultures[selectedCountry]?.sort((a, b) => b.count - a.count).map((culture, index) => (
-                  <motion.div
-                    key={culture.name}
-                    className="relative p-6 rounded-lg border transition-all overflow-hidden"
-                    style={{
-                      backgroundColor: viewMode === "ancient" ? "rgba(255, 255, 255, 0.5)" : "rgba(255, 255, 255, 0.7)",
-                      borderColor: viewMode === "ancient" ? "#C4A484" : "#CCCCCC"
-                    }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ 
-                      y: -5, 
-                      boxShadow: viewMode === "ancient" ? "0 10px 20px -5px rgba(139, 69, 19, 0.2)" : "0 10px 20px -5px rgba(70, 130, 180, 0.2)"
-                    }}
-                  >
-                    <div 
-                      className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r"
-                      style={{
-                        background: viewMode === "ancient" ? "linear-gradient(to right, #8B5A2B, #A0522D)" : "linear-gradient(to right, #4682B4, #87CEEB)"
-                      }}
-                    ></div>
-                    <div className="relative">
-                      <h3 
-                        className="text-xl font-semibold mb-2"
-                        style={{
-                          color: viewMode === "ancient" ? "#5C4033" : "#333333"
-                        }}
-                      >
-                        {culture.name}
-                      </h3>
-                      {culture.count > 1 && (
-                        <motion.div 
-                          className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border"
-                          style={{
-                            backgroundColor: viewMode === "ancient" ? "rgba(139, 69, 19, 0.1)" : "rgba(70, 130, 180, 0.1)",
-                            borderColor: viewMode === "ancient" ? "rgba(139, 69, 19, 0.3)" : "rgba(70, 130, 180, 0.3)",
-                            color: viewMode === "ancient" ? "#8B5A2B" : "#4682B4"
-                          }}
-                          whileHover={{ scale: 1.05 }}
-                        >
-                          {culture.count} records
-                        </motion.div>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
+            <CountryDetails
+              country={selectedCountry}
+              cultures={countryToCultures[selectedCountry]}
+              viewMode={viewMode}
+              onClose={() => setSelectedCountry(null)}
+              colors={currentColors}
+            />
           )}
         </AnimatePresence>
 
-       
         <AnimatePresence>
           {selectedCountry && !countryToCultures[selectedCountry] && (
-            <motion.div
-              className="mt-12 rounded-xl p-8 shadow-lg border-2 backdrop-blur-sm text-center"
-              style={{
-                backgroundColor: viewMode === "ancient" ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.5)",
-                borderColor: viewMode === "ancient" ? "#C4A484" : "#CCCCCC"
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <p 
-                className="text-xl italic"
-                style={{
-                  color: viewMode === "ancient" ? "rgba(92, 64, 51, 0.9)" : "rgba(51, 51, 51, 0.9)"
-                }}
-              >
-                No sacred traditions recorded for {selectedCountry} in our ancient scrolls.
-              </p>
-              <motion.button 
-                onClick={() => setSelectedCountry(null)}
-                className="mt-6 px-6 py-2 rounded-lg font-medium transition-colors"
-                style={{
-                  backgroundColor: viewMode === "ancient" ? "#8B5A2B" : "#4682B4",
-                  color: "#FFFFFF"
-                }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Return to Map
-              </motion.button>
-            </motion.div>
+            <NoDataMessage
+              country={selectedCountry}
+              viewMode={viewMode}
+              onClose={() => setSelectedCountry(null)}
+              colors={currentColors}
+            />
           )}
         </AnimatePresence>
 
-       
-        <motion.footer 
+        <motion.footer
           className="mt-16 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
         >
-          <p 
+          <p
             className="text-sm"
-            style={{
-              color: viewMode === "ancient" ? "rgba(92, 64, 51, 0.7)" : "rgba(51, 51, 51, 0.7)"
-            }}
+            style={{ color: `rgba(${(currentColors.text >> 16) & 0xFF}, ${(currentColors.text >> 8) & 0xFF}, ${currentColors.text & 0xFF}, 0.7)` }}
           >
             Explore the wisdom of ancient civilizations. Click on countries to discover their cultural heritage.
           </p>
@@ -680,5 +554,142 @@ const MapPage: React.FC = () => {
     </motion.div>
   );
 };
+
+const CountryDetails: React.FC<{
+  country: string;
+  cultures: { name: string; count: number }[];
+  viewMode: "standard" | "ancient";
+  onClose: () => void;
+  colors: typeof COLORS.ancient; // Use a specific type from COLORS for better type safety
+}> = ({ country, cultures, viewMode, onClose, colors }) => (
+  <motion.div
+    className="mt-12 rounded-xl p-8 shadow-lg border-2 backdrop-blur-sm"
+    style={{
+      backgroundColor: `rgba(255, 255, 255, ${viewMode === "ancient" ? 0.3 : 0.5})`,
+      borderColor: `#${colors.secondary.toString(16).padStart(6, '0')}`
+    }}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: 20 }}
+    transition={{ duration: 0.4 }}
+  >
+    <div className="flex justify-between items-center mb-8">
+      <div>
+        <motion.h2
+          className="text-3xl md:text-4xl font-bold"
+          style={{ color: `#${colors.text.toString(16).padStart(6, '0')}` }}
+          whileHover={{ x: 5 }}
+        >
+          {country}
+        </motion.h2>
+        <p
+          className="text-lg italic"
+          style={{ color: `rgba(${(colors.text >> 16) & 0xFF}, ${(colors.text >> 8) & 0xFF}, ${colors.text & 0xFF}, 0.9)` }}
+        >
+          {cultures.reduce((sum, c) => sum + c.count, 0)} sacred traditions
+        </p>
+      </div>
+      <motion.button
+        onClick={onClose}
+        className="p-2 rounded-full hover:bg-opacity-20 transition-all"
+        style={{
+          color: `#${colors.primary.toString(16).padStart(6, '0')}`,
+          backgroundColor: `rgba(${(colors.primary >> 16) & 0xFF}, ${(colors.primary >> 8) & 0xFF}, ${colors.primary & 0xFF}, 0.1)`
+        }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </motion.button>
+    </div>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {cultures.sort((a, b) => b.count - a.count).map((culture, index) => (
+        <motion.div
+          key={culture.name}
+          className="relative p-6 rounded-lg border transition-all overflow-hidden"
+          style={{
+            backgroundColor: `rgba(255, 255, 255, ${viewMode === "ancient" ? 0.5 : 0.7})`,
+            borderColor: `#${colors.secondary.toString(16).padStart(6, '0')}`
+          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+          whileHover={{
+            y: -5,
+            boxShadow: `0 10px 20px -5px rgba(${(colors.primary >> 16) & 0xFF}, ${(colors.primary >> 8) & 0xFF}, ${colors.primary & 0xFF}, 0.2)`
+          }}
+        >
+          <div
+            className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r"
+            style={{
+              background: `linear-gradient(to right, #${colors.primary.toString(16).padStart(6, '0')}, #${(colors.primary + 0x222222).toString(16).padStart(6, '0')})`
+            }}
+          />
+          <div className="relative">
+            <h3
+              className="text-xl font-semibold mb-2"
+              style={{ color: `#${colors.text.toString(16).padStart(6, '0')}` }}
+            >
+              {culture.name}
+            </h3>
+            {culture.count > 1 && (
+              <motion.div
+                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border"
+                style={{
+                  backgroundColor: `rgba(${(colors.primary >> 16) & 0xFF}, ${(colors.primary >> 8) & 0xFF}, ${colors.primary & 0xFF}, 0.1)`,
+                  borderColor: `rgba(${(colors.primary >> 16) & 0xFF}, ${(colors.primary >> 8) & 0xFF}, ${colors.primary & 0xFF}, 0.3)`,
+                  color: `#${colors.primary.toString(16).padStart(6, '0')}`
+                }}
+                whileHover={{ scale: 1.05 }}
+              >
+                {culture.count} records
+              </motion.div>
+            )}
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  </motion.div>
+);
+
+const NoDataMessage: React.FC<{
+  country: string;
+  viewMode: "standard" | "ancient";
+  onClose: () => void;
+  colors: typeof COLORS.ancient; // Use a specific type from COLORS
+}> = ({ country, viewMode, onClose, colors }) => (
+  <motion.div
+    className="mt-12 rounded-xl p-8 shadow-lg border-2 backdrop-blur-sm text-center"
+    style={{
+      backgroundColor: `rgba(255, 255, 255, ${viewMode === "ancient" ? 0.3 : 0.5})`,
+      borderColor: `#${colors.secondary.toString(16).padStart(6, '0')}`
+    }}
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+  >
+    <p
+      className="text-xl italic"
+      style={{ color: `rgba(${(colors.text >> 16) & 0xFF}, ${(colors.text >> 8) & 0xFF}, ${colors.text & 0xFF}, 0.9)` }}
+    >
+      No sacred traditions recorded for {country} in our ancient scrolls.
+    </p>
+    <motion.button
+      onClick={onClose}
+      className="mt-6 px-6 py-2 rounded-lg font-medium transition-colors"
+      style={{
+        backgroundColor: `#${colors.primary.toString(16).padStart(6, '0')}`,
+        color: "#FFFFFF"
+      }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+    >
+      Return to Map
+    </motion.button>
+  </motion.div>
+);
 
 export default MapPage;
