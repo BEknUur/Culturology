@@ -329,7 +329,7 @@ const MapPage: React.FC = () => {
       }
     });
 
-    // Add animation to the map
+    
     chart.appear(1000, 100);
     return () => {
       if (chartRef.current) {
@@ -363,12 +363,7 @@ const MapPage: React.FC = () => {
     }
   };
 
-  if (!isLoaded) return (
-    <div className="min-h-screen bg-[#F5F5DC] flex justify-center items-center">
-      <LoadingSpinner />
-    </div>
-  );
-  if (!isSignedIn) return <Navigate to="/signin" replace />;
+ 
 
   return (
     <motion.div 
@@ -381,7 +376,7 @@ const MapPage: React.FC = () => {
       }}
       animate={controls}
     >
-      {/* Ancient symbols floating in background */}
+      
       <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-10">
         {[...Array(8)].map((_, i) => (
           <motion.div
@@ -497,7 +492,7 @@ const MapPage: React.FC = () => {
           )}
         </motion.div>
 
-        {/* Map container */}
+        
         <motion.div 
           className="relative rounded-xl overflow-hidden shadow-2xl border-2"
           style={{
@@ -544,7 +539,7 @@ const MapPage: React.FC = () => {
           )}
         </motion.div>
 
-        {/* Selected country details */}
+        
         <AnimatePresence>
           {selectedCountry && countryToCultures[selectedCountry] && (
             <motion.div
@@ -647,7 +642,7 @@ const MapPage: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* No data message */}
+        
         <AnimatePresence>
           {selectedCountry && !countryToCultures[selectedCountry] && (
             <motion.div
@@ -684,7 +679,7 @@ const MapPage: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* Footer */}
+        
         <motion.footer 
           className="mt-16 text-center"
           initial={{ opacity: 0 }}

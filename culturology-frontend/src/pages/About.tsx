@@ -97,7 +97,7 @@ const About: React.FC = () => {
             className="text-5xl md:text-7xl font-bold tracking-tight"
             variants={itemVariants}
           >
-            <span className="block text-amber-900">Sacred Wisdom</span>
+            <span className="block text-amber-900">Сulturology</span>
             <span className="relative inline-block mt-2">
               <span className="text-amber-700">of Ancient Cultures</span>
               <motion.span
@@ -118,33 +118,38 @@ const About: React.FC = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-12 items-start">
-          <motion.div 
-            className="bg-white/30 backdrop-blur-sm p-8 rounded-xl border border-amber-200/50 shadow-lg"
-            initial="hidden"
-            animate={controls}
-            variants={containerVariants}
-          >
-            <motion.h2 
-              className="text-3xl font-bold text-amber-800 mb-6"
-              variants={itemVariants}
-            >
-              The Oracle Speaks
-            </motion.h2>
-            
-            <motion.div className="space-y-4" variants={containerVariants}>
-              <motion.p className="text-lg" variants={itemVariants}>
-                In the Han Dynasty, scholars preserved knowledge on bamboo slips. Today, we encode cultural DNA in digital form.
-              </motion.p>
-              
-              <motion.p className="text-lg" variants={itemVariants}>
-                The Terracotta Army stands guard over Qin's legacy, while our algorithms protect the integrity of oral histories from Polynesia to the Steppes.
-              </motion.p>
-              
-              <motion.p className="text-lg italic" variants={itemVariants}>
-                "As Confucius taught: 'Study the past if you would define the future.'"
-              </motion.p>
-            </motion.div>
-          </motion.div>
+        <motion.div
+  className="bg-white/30 backdrop-blur-sm p-8 rounded-xl border border-amber-200/50 shadow-lg"
+  initial="hidden"
+  animate={controls}
+  variants={containerVariants}
+>
+  <motion.h2
+    className="text-3xl font-bold text-amber-800 mb-6"
+    variants={itemVariants}
+  >
+    My Motivation
+  </motion.h2>
+
+  <motion.div className="space-y-6 text-left" variants={containerVariants}>
+    <motion.p className="text-lg leading-relaxed text-stone-800" variants={itemVariants}>
+      This site was created with <span className="font-semibold text-amber-700">love</span> — so anyone can explore the cultures and traditions of the world without leaving home.
+    </motion.p>
+
+    <motion.p className="text-md italic text-stone-700 pl-4 border-l-4 border-amber-400" variants={itemVariants}>
+      Thanks for stopping by! <br />
+      <span className="text-stone-800">I hope <span className="font-semibold text-amber-800">Culturology</span> brings you new knowledge and warm feelings.</span>
+    </motion.p>
+
+    <motion.blockquote
+      className="text-md text-stone-600 italic border-l-4 border-stone-300 pl-4 mt-4"
+      variants={itemVariants}
+    >
+      “Be so good, so they can’t ignore you.”
+    </motion.blockquote>
+  </motion.div>
+</motion.div>
+
 
           <motion.div 
             className="bg-white/30 backdrop-blur-sm p-8 rounded-xl border border-amber-200/50 shadow-lg text-center"
@@ -176,7 +181,7 @@ const About: React.FC = () => {
               className="text-lg text-stone-700 mb-4"
               variants={itemVariants}
             >
-              Digital Storykeeper & Cultural Architect
+              Full-Stack Developer
             </motion.p>
             
             <motion.div
@@ -184,9 +189,9 @@ const About: React.FC = () => {
               variants={itemVariants}
             >
               {[
-                { href: "https://t.me/bergty", icon: "𓃭", label: "Oracle" },
-                { href: "https://www.linkedin.com/in/beknur-ualikhanuly-039704245/", icon: "𓃗", label: "Wisdom" },
-                { href: "https://github.com/BEknUur", icon: "𓃒", label: "Code" }
+                { href: "https://t.me/bergty", icon: "𓃭", label: "Telegram" },
+                { href: "https://www.linkedin.com/in/beknur-ualikhanuly-039704245/", icon: "𓃗", label: "LinkedIn" },
+                { href: "https://github.com/BEknUur", icon: "𓃒", label: "Github" }
               ].map((item, index) => (
                 <motion.a
                   key={index}
@@ -223,18 +228,18 @@ const About: React.FC = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                title: "Harmony",
-                content: "As the Yellow River flows, we balance technology with tradition, creating digital spaces that honor ancestral ways.",
+                title: "Cultural Map",
+                content: "Explore a world map of ethnic groups, traditions, and sacred sites—right from your screen.",
                 symbol: "☯"
               },
               {
-                title: "Remembrance",
-                content: "From the Great Wall to Silicon Valley, we etch stories in the digital stone of tomorrow.",
+                title: "Interactive Quizzes",
+                content: "Test your knowledge of ancient cultures and traditions through engaging quizzes crafted to educate and entertain.",
                 symbol: "𓁹"
               },
               {
-                title: "Connection",
-                content: "Bridging 56 ethnic traditions with AI, we weave a tapestry of shared human heritage.",
+                title: "AI Cultural Guide",
+                content: "Ask anything about world cultures—our AI bot is here to answer, inspire, and guide your journey.",
                 symbol: "∞"
               }
             ].map((item, index) => (

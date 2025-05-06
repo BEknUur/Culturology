@@ -151,7 +151,7 @@ const MediaPage: React.FC = () => {
             {selected.caption && (
               <div className="p-6 bg-white/90 border-t border-amber-100">
                 <h3 className="text-xl font-bold text-amber-700 mb-2 flex items-center">
-                  <span className="mr-2">𓃗</span> Oracle's Notes
+                  <span className="mr-2">𓃗</span> Discover & Learn
                 </h3>
                 <p className="text-stone-700">{selected.caption}</p>
               </div>

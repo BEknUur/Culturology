@@ -109,7 +109,7 @@ const Navbar = () => {
                 <SignInButton>
                   <button className="flex items-center rounded-lg border-2 border-amber-700 bg-amber-600/10 px-5 py-2 text-lg font-medium text-amber-800 shadow-md hover:bg-amber-600/20 hover:border-amber-800 hover:text-amber-900 transition-all group">
                     <span className="mr-2 opacity-0 group-hover:opacity-100 transition-opacity">𓂀</span>
-                    Enter Temple
+                    Sign In
                     <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">𓂀</span>
                   </button>
                 </SignInButton>

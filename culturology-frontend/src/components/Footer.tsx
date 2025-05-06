@@ -93,9 +93,9 @@ const Footer = () => {
             
             <div className="flex space-x-6">
               {[
-                { href: "https://t.me/bergty", icon: "𓃭", label: "Oracle" },
-                { href: "https://www.linkedin.com/in/beknur-ualikhanuly-039704245/", icon: "𓃗", label: "Wisdom" },
-                { href: "https://github.com/BEknUur", icon: "𓃒", label: "Code" }
+                { href: "https://t.me/bergty", icon: "𓃭", label: "telegram" },
+                { href: "https://www.linkedin.com/in/beknur-ualikhanuly-039704245/", icon: "𓃗", label: "linkedin" },
+                { href: "https://github.com/BEknUur", icon: "𓃒", label: "github" }
               ].map((item, index) => (
                 <motion.a
                   key={index}
