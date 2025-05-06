@@ -6,7 +6,7 @@ import { getCultureBySlug, getQuizByCulture, getCultures } from "@/api";
 import { Culture, Quiz } from "@/types";
 import Gallery from "@/components/Gallery";
 import CultureCard from "@/components/CultureCard";
-import SearchBar from "@/components/SearchBar";
+
 
 const tabs = ["About", "Traditions", "Lifestyle", "Sacred Knowledge"] as const;
 

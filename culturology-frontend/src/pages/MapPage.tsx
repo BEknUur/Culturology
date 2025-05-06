@@ -113,7 +113,7 @@ const MapPage: React.FC = () => {
       })
     );
 
-    // Add zoom controls with custom styling
+    
     const zoomControl = am5map.ZoomControl.new(root, {
       marginBottom: 15,
       marginRight: 15,
@@ -175,7 +175,7 @@ const MapPage: React.FC = () => {
       })
     );
 
-    // Set base map style based on view mode
+   
     polygonSeries.mapPolygons.template.setAll({
       fill: viewMode === "ancient" ? am5.color(0xE6D5B8) : am5.color(0xE8E8E8),
       stroke: viewMode === "ancient" ? am5.color(0xC4A484) : am5.color(0xCCCCCC),
@@ -208,7 +208,7 @@ const MapPage: React.FC = () => {
           const hexColor = (finalR << 16) | (finalG << 8) | finalB;
           return am5.color(hexColor);
         } else {
-          const hue = 200 - (intensity * 40); // Light blue to blue gradient
+          const hue = 200 - (intensity * 40); 
           const saturation = 80 + (intensity * 20);
           const lightness = 90 - (intensity * 30);
           const hslToHex = (h: number, s: number, l: number) => {
@@ -244,25 +244,8 @@ const MapPage: React.FC = () => {
       const countryName = (ev.target.dataItem?.dataContext as { name?: string })?.name;
       if (countryName) {
         setSelectedCountry(countryName);
-        const polygon = ev.target;
-        const centroid = polygon.visualCentroid();
-        if (centroid) {
-          chart.animate({
-            key: "rotationX",
-            to: -centroid.longitude,
-            duration: 1000
-          });
-          chart.animate({
-            key: "rotationY",
-            to: -centroid.latitude,
-            duration: 1000
-          });
-          chart.animate({
-            key: "zoomLevel",
-            to: 3,
-            duration: 1000
-          });
-        }
+       
+       
       }
     });
 
@@ -307,7 +290,7 @@ const MapPage: React.FC = () => {
       });
     });
 
-    // Add data to point series
+   
     Object.entries(countryToCultures).forEach(([country, cultures]) => {
       let polygon: am5map.MapPolygon | undefined;
       polygonSeries.mapPolygons.each((item) => {
@@ -362,8 +345,6 @@ const MapPage: React.FC = () => {
       chart.goHome();
     }
   };
-
- 
 
   return (
     <motion.div 
@@ -492,7 +473,7 @@ const MapPage: React.FC = () => {
           )}
         </motion.div>
 
-        
+       
         <motion.div 
           className="relative rounded-xl overflow-hidden shadow-2xl border-2"
           style={{
@@ -504,7 +485,7 @@ const MapPage: React.FC = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
         >
-          {/* Decorative corners */}
+          
           <div 
             className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 rounded-tl-xl"
             style={{
@@ -642,7 +623,7 @@ const MapPage: React.FC = () => {
           )}
         </AnimatePresence>
 
-        
+       
         <AnimatePresence>
           {selectedCountry && !countryToCultures[selectedCountry] && (
             <motion.div
@@ -679,7 +660,7 @@ const MapPage: React.FC = () => {
           )}
         </AnimatePresence>
 
-        
+       
         <motion.footer 
           className="mt-16 text-center"
           initial={{ opacity: 0 }}
