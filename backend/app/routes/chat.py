@@ -5,7 +5,7 @@ import openai
 from ..database.session import get_db
 from ..models.culture import Culture
 from ..schemas.chat import ChatRequest, ChatResponse  
-
+from openai.error import OpenAIError
 
 OPENAI_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_KEY:
@@ -48,11 +48,11 @@ async def chat_with_culture(
             temperature=0.7,
             max_tokens=500,
         )
-    except openai.error.OpenAIError as e:
+    except OpenAIError as e:
         raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"OpenAI API error: {e}"
-        )
+        status_code=status.HTTP_502_BAD_GATEWAY,
+        detail=f"OpenAI API error: {e}"
+    )
     answer = resp.choices[0].message.content.strip()
     return ChatResponse(answer=answer)
 
