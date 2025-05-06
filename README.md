@@ -18,8 +18,7 @@
 
 Посмотрите короткое превью  приложения
 
-[![Просмотр видео-превью](https://cdn.loom.com/sessions/thumbnails/e78d0b2fe14e4eb0b5207a84b056d9cd-with-play.gif)](https://www.loom.com/share/e78d0b2fe14e4eb0b5207a84b056d9cd)
-
+https://www.loom.com/share/e78d0b2fe14e4eb0b5207a84b056d9cd?sid=f0a547dc-80f7-4516-837a-7e5636eb1ff5
 ---
 
 ## 🔥 Основные фичи
