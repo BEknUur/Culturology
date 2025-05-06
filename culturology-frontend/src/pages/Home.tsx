@@ -11,34 +11,34 @@ export default function Home() {
 
   const cultures = [
     {
-      id: 'kazakh',
-      name: 'Kazakh Eagle Hunters',
-      description: 'Explore the ancient bond between humans and golden eagles in Mongolia\'s Altai Mountains',
-      image: '/assets/kazakh.webp',
+      id: 'Chukchi',
+      name: 'Chukchi culture',
+      description: 'The Chukchi are known for throat singing, a form of vocalization that produces harmonics and is deeply connected to their spiritual life.',
+      image: '/assets/chukchi.webp',
       colorLight: 'var(--color-amber-100)',
       colorDark: 'var(--color-amber-800)',
-      region: 'Central Asia',
-      symbol: '🦅'
+      region: 'Russia',
+      
     },
     {
-      id: 'himba',
-      name: 'Himba People',
-      description: 'Discover the ochre-covered beauty and matriarchal traditions of Namibia\'s desert dwellers',
-      image: '/assets/himba.webp',
+      id: 'inuit',
+      name: 'Inuit culture',
+      description: 'The Inuit are the Indigenous inhabitants of the Arctic’s vast circumpolar regions, spanning Canada, Alaska, Greenland, and Chukotka (Russia).',
+      image: '/assets/inuit.webp',
       colorLight: 'var(--color-red-100)',
       colorDark: 'var(--color-red-800)',
-      region: 'Southern Africa',
-      symbol: '🧴'
+      region: 'Arctic',
+      
     },
     {
-      id: 'tsaatan',
-      name: 'Tsaatan Reindeer Herders',
-      description: 'Journey with the last reindeer herders of Mongolia\'s taiga forests',
-      image: '/assets/tsaatan.webp',
+      id: 'Sámi',
+      name: 'Sámi culture',
+      description: 'The Sámi people hold deep spiritual knowledge passed down through generations:',
+      image: '/assets/sami.webp',
       colorLight: 'var(--color-blue-100)',
       colorDark: 'var(--color-blue-800)',
-      region: 'Northern Asia',
-      symbol: '🦌'
+      region: 'Finland',
+     
     }
   ];
 
@@ -54,30 +54,29 @@ export default function Home() {
 
   const features = [
     {
-      title: 'Living Archives',
-      description: 'Interactive timelines with historical context',
-      icon: '📜',
-      path: '/archives'
+      title: 'Cultural Atlas',
+      description: 'Traverse sacred lands and tribal roots on an interactive map that reveals hidden cultural legacies.',
+      
+      path: '/map'
+    },
+    {
+      title: 'Living Cultures',
+      description: 'Dive into the traditions, languages, and rituals of indigenous communities — curated, verified, and brought to life.',
+      
+      path: '/cultures'
+    },
+    {
+      title: 'Behind the Vision',
+      description: 'Meet the mind behind Culturology and uncover the mission to preserve intangible heritage through technology.',
+      path: '/about'
     },
     {
       title: 'Sacred Geometry',
       description: 'Decode ancient patterns and symbols',
-      icon: '🔺',
       path: '/symbols'
-    },
-    {
-      title: 'Oral Traditions',
-      description: 'First-hand stories from elders',
-      icon: '👂',
-      path: '/stories'
-    },
-    {
-      title: 'Cultural Atlas',
-      description: 'Geospatial exploration tool',
-      icon: '🗺️',
-      path: '/atlas'
     }
   ];
+  
 
   const fadeIn = {
     hidden: { opacity: 0 },
@@ -160,9 +159,7 @@ export default function Home() {
                   initial="hidden"
                   animate={isInView ? "visible" : "hidden"}
                 >
-                  <motion.div variants={slideUp} className="text-5xl mb-4">
-                    {cultures[activeCulture].symbol}
-                  </motion.div>
+                  
                   <motion.h1 
                     variants={slideUp}
                     className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4 leading-tight"
@@ -215,16 +212,16 @@ export default function Home() {
             className="max-w-4xl mx-auto text-center"
           >
             <motion.div variants={slideUp} className="text-amber-300 mb-6 text-4xl">✧</motion.div>
-            <motion.h2 variants={slideUp} className="text-3xl md:text-4xl font-bold mb-6">Preserving Intangible Heritage</motion.h2>
+            <motion.h2 variants={slideUp} className="text-3xl md:text-4xl font-bold mb-6 ">Mapping Cultural Diversity</motion.h2>
             <motion.p variants={slideUp} className="text-xl md:text-2xl mb-8 leading-relaxed">
-              We partner with indigenous communities to document endangered traditions using ethical, consent-based methods that prioritize cultural sovereignty.
+            Our interactive world map lets you explore the origins, practices, and sacred sites of diverse cultures — making hidden knowledge visible, one tradition at a time.
             </motion.p>
             <motion.div variants={slideUp}>
               <Link
-                to="/methodology"
+                to="/map"
                 className="inline-flex items-center px-6 py-3 border-2 border-amber-300 text-amber-300 rounded-full font-medium hover:bg-amber-300/10 transition-colors group"
               >
-                Our Methodology
+                Map
                 <svg className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
@@ -242,8 +239,8 @@ export default function Home() {
             variants={staggerContainer}
             className="max-w-4xl mx-auto text-center mb-16"
           >
-            <motion.h2 variants={slideUp} className="text-3xl md:text-4xl font-bold mb-4">Multidimensional Exploration</motion.h2>
-            <motion.p variants={slideUp} className="text-xl text-amber-800/90">Experience cultures through multiple lenses and perspectives</motion.p>
+            <motion.h2 variants={slideUp} className="text-3xl md:text-4xl font-bold mb-4">Explore Culture in Every Dimension</motion.h2>
+            <motion.p variants={slideUp} className="text-xl text-amber-800/90">From sacred lands to sacred words — trace, learn, and interact with the wisdom of civilizations.</motion.p>
           </motion.div>
           <motion.div
             initial="hidden"
@@ -260,7 +257,6 @@ export default function Home() {
                 className="group relative bg-amber-50 rounded-xl p-8 border border-amber-200 hover:shadow-lg transition-all overflow-hidden"
               >
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-amber-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="text-4xl mb-4">{feature.icon}</div>
                 <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
                 <p className="text-amber-800/90 mb-6">{feature.description}</p>
                 <Link
