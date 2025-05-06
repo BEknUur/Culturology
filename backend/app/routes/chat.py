@@ -4,17 +4,15 @@ from dotenv import load_dotenv
 import openai
 from fastapi import APIRouter, Depends, HTTPException, status, Path
 from sqlalchemy.orm import Session
-from openai.error import OpenAIError
 
 from ..database.session import get_db
 from ..models.culture import Culture
 from ..schemas.chat import ChatRequest, ChatResponse
 
+# Загружаем переменные из .env
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../.env"))
 
-dotenv_path = os.path.join(os.path.dirname(__file__), "../.env")
-load_dotenv(dotenv_path=dotenv_path)
-
-
+# Устанавливаем API-ключ
 OPENAI_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_KEY:
     raise RuntimeError("OPENAI_API_KEY not set in environment")
@@ -33,7 +31,6 @@ async def chat_with_culture(
     payload: ChatRequest = ...,
     db: Session = Depends(get_db),
 ):
-    # Проверяем, что культура есть в БД
     culture = db.query(Culture).filter(Culture.slug == slug).first()
     if not culture:
         raise HTTPException(
@@ -47,7 +44,6 @@ async def chat_with_culture(
     )
     user_prompt = payload.question
 
-    # Вызываем OpenAI и ловим любые ошибки клиента
     try:
         resp = await openai.ChatCompletion.acreate(
             model="gpt-3.5-turbo",
@@ -58,7 +54,7 @@ async def chat_with_culture(
             temperature=0.7,
             max_tokens=500,
         )
-    except OpenAIError as e:
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=f"OpenAI API error: {e}"
@@ -81,7 +77,6 @@ async def chat_general(
         "Feel free to answer any questions about indigenous cultures, "
         "their traditions, languages, history and how the site works."
     )
-
     try:
         resp = await openai.ChatCompletion.acreate(
             model="gpt-3.5-turbo",
@@ -92,7 +87,7 @@ async def chat_general(
             temperature=0.7,
             max_tokens=500,
         )
-    except OpenAIError as e:
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=f"OpenAI API error: {e}"

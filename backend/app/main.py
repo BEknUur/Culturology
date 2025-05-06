@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .database.session import engine, Base
-from .routes import cultures, quiz,  chat,media
+from .routes import cultures, quiz, chat,media
 from dotenv import load_dotenv
 import os
 
