@@ -1,45 +1,48 @@
 import { useState, useEffect } from "react";
-import { useParams, Navigate } from "react-router-dom";
-import { useUser } from "@clerk/clerk-react";
-import type { QuizItem } from "@/types/quiz";
-import { generateQuiz } from "@/api/index";
-import QuizComponent from "@/components/QuizComponent";
+import { useParams } from "react-router-dom";
+import Quiz from "../components/Quiz";
+import { generateQuiz } from "@/api";
 
-const QuizPage: React.FC = () => {
-  const { isLoaded, isSignedIn } = useUser();
-  const { slug } = useParams<{ slug: string }>();
 
- 
-  const [questions, setQuestions] = useState<QuizItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+type QuizQuestion = {
+  id: string;
+  question: string;
+  options: Record<string, string>;
+  correct: string;
+};
+
+const QuizPage = () => {
+  const { slug } = useParams();
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!slug) return;
-    (async () => {
-      setLoading(true);
-      setError(null);
+    const fetchQuestions = async () => {
       try {
-        const data = await generateQuiz(slug);
-        setQuestions(data);
-      } catch (err: any) {
-        setError(err.message ?? "Ошибка генерации викторины");
+        setLoading(true);
+        const data = await generateQuiz(slug || "");
+        setQuestions(data.map((item: any) => ({ ...item, id: String(item.id) })));
+      } catch (err) {
+        setError("Failed to load quiz");
       } finally {
         setLoading(false);
       }
-    })();
+    };
+
+    fetchQuestions();
   }, [slug]);
 
-  
-  if (!isLoaded) return null;
-  if (!isSignedIn) return <Navigate to="/signin" replace />;
+  const handleComplete = (score: number) => {
+    console.log(`Quiz completed! Score: ${score}/${questions.length}`);
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-900 to-stone-900">
+      <div className="flex items-center justify-center h-screen">
         <div className="text-center">
-          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-amber-500 border-t-transparent mb-4" />
-          <p className="text-amber-100">Generate...</p>
+          <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-stone-600">Loading quiz questions...</p>
         </div>
       </div>
     );
@@ -47,14 +50,20 @@ const QuizPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-900 to-stone-900">
-        <div className="text-center p-6 bg-stone-900/60 rounded-xl">
-          <p className="text-red-400 mb-4">{error}</p>
-          <button
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center p-6 bg-white rounded-lg shadow-md max-w-md">
+          <div className="text-red-500 mb-4">
+            <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold text-stone-800 mb-2">Error Loading Quiz</h3>
+          <p className="text-stone-600 mb-4">{error}</p>
+          <button 
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-amber-600 text-amber-100 rounded hover:bg-amber-500 transition"
+            className="px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-600 transition"
           >
-           Try later
+            Try Again
           </button>
         </div>
       </div>
@@ -63,24 +72,26 @@ const QuizPage: React.FC = () => {
 
   if (questions.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-900 to-stone-900">
-        <p className="text-amber-100 text-lg">This culture doesn't have quiz.</p>
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center p-6 bg-white rounded-lg shadow-md max-w-md">
+          <h3 className="text-xl font-bold text-stone-800 mb-2">No Questions Available</h3>
+          <p className="text-stone-600">This quiz doesn't have any questions yet.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-900 to-stone-900 pt-24 pb-12">
-      
-      <div className="container mx-auto px-4 flex flex-col items-center space-y-8">
-        <h1 className="text-4xl font-bold text-amber-100 text-center">
-          Quiziz culture{" "}
-          <span className="text-amber-400 capitalize">{slug}</span>
+    <div className="min-h-screen bg-stone-50 py-12 px-4">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-3xl font-bold text-center text-stone-800 mb-2">
+          {slug?.toUpperCase()} Culture Quiz
         </h1>
-
-        <div className="w-full max-w-3xl">
-          <QuizComponent quizzes={questions} />
-        </div>
+        <p className="text-center text-stone-600 mb-8">
+          Test your knowledge about {slug} traditions and history
+        </p>
+        
+        <Quiz questions={questions} onComplete={handleComplete} />
       </div>
     </div>
   );

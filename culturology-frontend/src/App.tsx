@@ -58,13 +58,13 @@ function AppWrapper() {
       {isLoaded && isSignedIn && (
         <button
           onClick={() => setChatOpen((o) => !o)}
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-xl bg-amber-600 p-3 shadow-lg hover:bg-amber-500 transition-colors"
+          className="fixed bottom-6 right-6 z-100 flex h-14 w-14 items-center justify-center rounded-xl bg-amber-600 p-3 shadow-lg hover:bg-amber-500 transition-colors"
           aria-label={chatOpen ? "Close chat" : "Open chat"}
         >
           {chatOpen ? (
-            <XMarkIcon className="h-6 w-6 text-amber-100" />
+            <XMarkIcon className="h-6 w-6 text-amber-100 z-100" />
           ) : (
-            <ChatBubbleLeftRightIcon className="h-6 w-6 text-amber-100" />
+            <ChatBubbleLeftRightIcon className="h-6 w-6 text-amber-100 z-100" />
           )}
         </button>
       )}

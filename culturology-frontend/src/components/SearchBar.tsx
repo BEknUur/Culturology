@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { getRegions } from "@/api";
+import { useNavigate } from "react-router-dom";
 
 interface SearchBarProps {
   onSearch: (q: string) => void;
@@ -11,6 +12,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onRegionChange }) => {
   const [regions, setRegions] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadRegions = async () => {
@@ -36,16 +38,22 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onRegionChange }) => {
     onRegionChange(e.target.value);
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate(`/cultures?q=${searchQuery}`);
+  };
+
   return (
-    <motion.div 
-      className="flex flex-col md:flex-row gap-4"
+    <motion.form 
+      onSubmit={handleSubmit}
+      className="space-y-4"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      
+      {/* Search input */}
       <motion.div 
-        className="relative flex-1"
+        className="relative"
         whileHover={{ scale: 1.01 }}
       >
         <input
@@ -55,13 +63,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onRegionChange }) => {
           onChange={handleSearchChange}
           className="
             w-full
-            rounded-xl
-            px-5 py-3
-            border-2 border-amber-400/70
-            bg-white text-amber-900 placeholder-amber-600/70
+            rounded-lg
+            px-4 py-3
+            border border-stone-300
+            bg-white text-stone-800 placeholder-stone-500
             focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
             transition-all duration-200
-            shadow-lg
+            shadow-sm
             pr-10
             font-['Cormorant'] text-lg
           "
@@ -83,23 +91,23 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onRegionChange }) => {
           onChange={handleRegionChange}
           disabled={isLoading}
           className="
-            w-full md:w-48
-            rounded-xl
-            px-5 py-3
-            border-2 border-amber-400/70
-            bg-white text-amber-900
+            w-full
+            rounded-lg
+            px-4 py-3
+            border border-stone-300
+            bg-white text-stone-800
             focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
             transition-all duration-200
-            shadow-lg
+            shadow-sm
             appearance-none
             cursor-pointer
             disabled:opacity-70
             font-['Cormorant'] text-lg
           "
         >
-          <option value="">All regions</option>
+          <option value="" className="bg-white">All regions</option>
           {regions.map((r) => (
-            <option key={r} value={r}>
+            <option key={r} value={r} className="bg-white">
               {r}
             </option>
           ))}
@@ -115,7 +123,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onRegionChange }) => {
           </div>
         )}
       </motion.div>
-    </motion.div>
+    </motion.form>
   );
 };
 

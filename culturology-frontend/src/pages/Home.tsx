@@ -4,24 +4,25 @@ import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
 export default function Home() {
-  const [scrollY, setScrollY] = useState(0);
+  const [activeSection, setActiveSection] = useState(0);
   const controls = useAnimation();
   const [ref, inView] = useInView({
-    threshold: 0.2,
+    threshold: 0.1,
     triggerOnce: false
   });
-
-  useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     if (inView) {
       controls.start("visible");
     }
   }, [controls, inView]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveSection((prev) => (prev + 1) % 3);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -47,64 +48,226 @@ export default function Home() {
     }
   };
 
-  const circleVariants = {
-    hidden: { scale: 0 },
-    visible: {
-      scale: 1,
-      transition: {
-        type: "spring",
-        damping: 6,
-        stiffness: 100
-      }
-    }
+  const featureVariants = {
+    hidden: { opacity: 0, x: -50 },
+    visible: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: 50 }
   };
 
+  const sections = [
+    {
+      title: "Discover Ancient Cultures",
+      description: "Explore the sacred traditions and forgotten wisdom of civilizations past",
+      symbol: "𓃭",
+      color: "from-amber-500 to-amber-600"
+    },
+    {
+      title: "Unlock Sacred Knowledge",
+      description: "Journey through time with our interactive cultural archives",
+      symbol: "𓃗",
+      color: "from-emerald-500 to-emerald-600"
+    },
+    {
+      title: "Preserve Lost Traditions",
+      description: "Help us safeguard humanity's diverse heritage for future generations",
+      symbol: "𓃒",
+      color: "from-blue-500 to-blue-600"
+    }
+  ];
+
   return (
-    <div className="relative min-h-screen overflow-hidden" ref={ref}>
+    <div 
+      className="relative min-h-screen overflow-hidden font-['Cormorant']"
+      ref={ref}
+    >
       
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-b from-amber-900 to-stone-900"
-        style={{ transform: `translateY(${scrollY * 0.15}px)` }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
+      <div 
+        className="absolute inset-0 bg-gradient-to-b from-amber-50 to-amber-100"
+        style={{
+          backgroundImage: "url('/assets/parchment-texture.png')",
+          backgroundBlendMode: "overlay"
+        }}
       />
 
       
-      <div className="absolute inset-0 pointer-events-none opacity-10">
-        <motion.div
-          className="absolute top-20 left-16 h-40 w-40 rounded-full border-4 border-amber-300"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.5, type: "spring", stiffness: 50 }}
-        />
-        <motion.div
-          className="absolute bottom-32 right-12 h-60 w-60 rounded-full border-4 border-amber-300"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.7, type: "spring", stiffness: 50 }}
-        />
-      </div>
-
-      
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-10">
         {[...Array(12)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute rounded-full bg-amber-400/20"
+            className="absolute text-5xl text-amber-800/20"
             style={{
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
-              width: `${Math.random() * 10 + 2}px`,
-              height: `${Math.random() * 10 + 2}px`,
+              fontFamily: "'Noto Sans Symbols', sans-serif"
             }}
             animate={{
-              y: [0, Math.random() * 100 - 50],
-              x: [0, Math.random() * 100 - 50],
-              opacity: [0.2, 0.8, 0.2]
+              rotate: [0, 360],
+              opacity: [0.1, 0.3, 0.1]
             }}
             transition={{
-              duration: Math.random() * 20 + 10,
+              duration: Math.random() * 40 + 20,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          >
+            {['𓃭', '𓃗', '𓃒', '𓃀', '𓂀', '𓃔', '𓃱', '𓃯'][i % 8]}
+          </motion.div>
+        ))}
+      </div>
+
+      
+      <motion.div
+        className="relative z-10 container mx-auto px-4 py-24"
+        initial="hidden"
+        animate={controls}
+        variants={containerVariants}
+      >
+        
+        <motion.div className="text-center mb-20" variants={itemVariants}>
+          <motion.h1 
+            className="text-5xl md:text-7xl font-bold mb-6"
+            whileHover={{ scale: 1.02 }}
+          >
+            <span className="block bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-amber-800">
+              Sacred Archives
+            </span>
+            <span className="block text-3xl md:text-4xl font-light text-amber-700 mt-4">
+              of Ancient Wisdom
+            </span>
+          </motion.h1>
+          
+          <motion.p 
+            className="text-xl md:text-2xl text-amber-800/90 max-w-3xl mx-auto leading-relaxed italic"
+            variants={itemVariants}
+          >
+            "Where the whispers of ancestors meet the curiosity of modern seekers"
+          </motion.p>
+        </motion.div>
+
+        
+        <div className="relative h-96 mb-20 overflow-hidden rounded-xl bg-white/30 backdrop-blur-sm border-2 border-amber-200 shadow-lg">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeSection}
+              className={`absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-br ${sections[activeSection].color} text-white`}
+              variants={featureVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={{ duration: 0.8 }}
+            >
+              <span className="text-8xl mb-6">{sections[activeSection].symbol}</span>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">{sections[activeSection].title}</h2>
+              <p className="text-xl max-w-2xl mx-auto">{sections[activeSection].description}</p>
+            </motion.div>
+          </AnimatePresence>
+          
+          
+          <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2">
+            {[0, 1, 2].map((i) => (
+              <button
+                key={i}
+                onClick={() => setActiveSection(i)}
+                className={`w-3 h-3 rounded-full transition-all ${i === activeSection ? 'bg-white w-6' : 'bg-white/50'}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        
+        <motion.div 
+          className="grid md:grid-cols-3 gap-8 mb-20"
+          variants={containerVariants}
+        >
+          {[
+            {
+              title: "Cultural Explorer",
+              description: "Journey through interactive maps of ancient civilizations",
+              icon: "𓁹",
+              link: "/cultures"
+            },
+            {
+              title: "Sacred Visions",
+              description: "Discover rare artifacts and digital reconstructions",
+              icon: "𓃭",
+              link: "/media"
+            },
+            {
+              title: "Wisdom Keeper",
+              description: "Learn about our mission to preserve cultural heritage",
+              icon: "𓃗",
+              link: "/about"
+            }
+          ].map((feature, i) => (
+            <motion.div
+              key={i}
+              className="bg-white/30 backdrop-blur-sm p-8 rounded-xl border-2 border-amber-200 hover:border-amber-300 shadow-lg hover:shadow-xl transition-all"
+              variants={itemVariants}
+              whileHover={{ y: -10 }}
+            >
+              <div className="text-5xl text-amber-700 mb-4">{feature.icon}</div>
+              <h3 className="text-2xl font-bold text-amber-800 mb-2">{feature.title}</h3>
+              <p className="text-amber-800/90 mb-6">{feature.description}</p>
+              <Link
+                to={feature.link}
+                className="inline-flex items-center text-amber-700 hover:text-amber-900 font-medium group"
+              >
+                Begin journey
+                <svg 
+                  className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        
+        <motion.div 
+          className="text-center"
+          variants={itemVariants}
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-amber-800 mb-6">Ready to Begin Your Journey?</h2>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              to="/cultures"
+              className="px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg font-bold hover:from-amber-500 hover:to-amber-600 transition-all shadow-lg hover:shadow-xl"
+            >
+              Explore Cultures
+            </Link>
+            <Link
+              to="/about"
+              className="px-8 py-4 border-2 border-amber-600 text-amber-700 rounded-lg font-bold hover:bg-amber-50 transition-all shadow hover:shadow-md"
+            >
+              Learn More
+            </Link>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute border border-amber-300/20 rounded-full"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              width: `${Math.random() * 300 + 100}px`,
+              height: `${Math.random() * 300 + 100}px`,
+            }}
+            animate={{
+              x: [0, Math.random() * 100 - 50],
+              y: [0, Math.random() * 100 - 50],
+              rotate: [0, 360]
+            }}
+            transition={{
+              duration: Math.random() * 30 + 20,
               repeat: Infinity,
               repeatType: "reverse",
               ease: "linear"
@@ -112,110 +275,6 @@ export default function Home() {
           />
         ))}
       </div>
-
-      <motion.div
-        className="relative flex min-h-screen flex-col items-center justify-center px-4 text-center"
-        initial="hidden"
-        animate={controls}
-        variants={containerVariants}
-      >
-        
-        <motion.div
-          className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-amber-600 p-4"
-          variants={circleVariants}
-          whileHover={{ scale: 1.05, rotate: 5 }}
-        >
-          <div className="h-full w-full rounded-full bg-stone-800 p-3">
-            <motion.div
-              className="h-full w-full rounded-full bg-amber-400"
-              animate={{
-                scale: [1, 1.05, 1],
-                opacity: [0.8, 1, 0.8]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-          </div>
-        </motion.div>
-
-        
-        <motion.h1
-          className="mb-6 font-serif text-5xl font-bold text-amber-100 md:text-6xl lg:text-7xl"
-          variants={itemVariants}
-        >
-          Discover the World's{" "}
-          <span className="relative inline-block">
-            <span className="text-amber-400">Hidden Cultures</span>
-            <motion.span
-              className="absolute bottom-0 left-0 w-full h-1 bg-amber-500"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 1, delay: 0.8 }}
-            />
-          </span>
-        </motion.h1>
-
-        
-        <motion.p
-          className="mb-12 max-w-2xl text-lg leading-relaxed text-amber-100/90 md:text-xl"
-          variants={itemVariants}
-        >
-          Explore traditions, stories, and languages of indigenous peoples across the globe.
-          Immerse yourself in their authentic world through interactive experiences.
-        </motion.p>
-
-       
-        <motion.div
-          className="flex flex-col gap-4 md:flex-row"
-          variants={itemVariants}
-        >
-          <Link
-            to="/cultures"
-            className="group relative inline-block overflow-hidden rounded-lg bg-gradient-to-r from-amber-700 to-amber-600 px-8 py-4 text-lg font-semibold text-amber-100 shadow-lg hover:shadow-2xl transition-all duration-300"
-          >
-            <span className="relative z-10">Explore Cultures</span>
-            <motion.span
-              className="absolute inset-0 translate-y-full bg-amber-800"
-              initial={{ translateY: "100%" }}
-              whileHover={{ translateY: 0 }}
-              transition={{ duration: 0.3 }}
-            />
-          </Link>
-
-          <Link
-            to="/media"
-            className="group relative inline-block overflow-hidden rounded-lg border border-amber-500 px-8 py-4 text-lg font-semibold text-amber-100 shadow hover:shadow-xl transition-all duration-300"
-          >
-            <span className="relative z-10">View Media</span>
-            <motion.span
-              className="absolute inset-0 -translate-x-full bg-stone-800"
-              initial={{ translateX: "-100%" }}
-              whileHover={{ translateX: 0 }}
-              transition={{ duration: 0.3 }}
-            />
-          </Link>
-        </motion.div>
-
-        
-        <motion.div
-          className="mt-24 flex items-center gap-4"
-          variants={itemVariants}
-          animate={{
-            y: [0, 10, 0],
-            opacity: [0.6, 1, 0.6]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        >
-          
-        </motion.div>
-      </motion.div>
     </div>
   );
 }

@@ -69,7 +69,7 @@ export const chatWithCulture = async (
   return data.answer;
 };
 
-// задаём общий вопрос
+
 export const chatGeneral = async (
   question: string
 ): Promise<string> => {

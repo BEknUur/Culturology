@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 
-/* Add this to your global.css or styles/index.css file */
+
 
 @keyframes fadeIn {
     from { opacity: 0; }

@@ -7,9 +7,9 @@ const Navbar = () => {
 
   const links = [
     { to: "/cultures", label: "Ancient Cultures", symbol: "𓃭" },
-    { to: "/map", label: "Silk Road", symbol: "𓃗" },
-    { to: "/media", label: "Sacred Texts", symbol: "𓃒" },
-    { to: "/about", label: "The Oracle", symbol: "𓃀" },
+    { to: "/map", label: "Culture Map", symbol: "𓃗" },
+    { to: "/media", label: "Media", symbol: "𓃒" },
+    { to: "/about", label: "About", symbol: "𓃀" },
   ];
 
   return (
@@ -37,7 +37,7 @@ const Navbar = () => {
             className="text-3xl font-bold text-amber-900 group-hover:text-amber-800 transition-colors"
             whileHover={{ scale: 1.02 }}
           >
-            Sacred Wisdom
+            Culturology
           </motion.span>
         </NavLink>
 

@@ -79,7 +79,7 @@ const Footer = () => {
                   <div className="h-full w-full rounded-full bg-amber-300/80"></div>
                 </div>
               </div>
-              <span className="font-['Cormorant'] text-2xl font-bold text-amber-900">Sacred Wisdom</span>
+              <span className="font-['Cormorant'] text-2xl font-bold text-amber-900">Culturology</span>
             </motion.div>
             
             <motion.p 
@@ -126,15 +126,15 @@ const Footer = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              Scrolls of Path
+              Links
             </motion.h3>
             <ul className="space-y-3 text-lg">
               {[
                 { to: "/", label: "Home" },
                 { to: "/cultures", label: "Ancient Cultures" },
-                { to: "/map", label: "Silk Road Map" },
-                { to: "/media", label: "Sacred Texts" },
-                { to: "/about", label: "The Oracle" }
+                { to: "/map", label: "Culture Map" },
+                { to: "/media", label: "Media" },
+                { to: "/about", label: "About" }
               ].map((link, index) => (
                 <motion.li 
                   key={link.to}
@@ -163,7 +163,7 @@ const Footer = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              Carved Tablets
+              Information
             </motion.h3>
             <ul className="space-y-4 text-lg">
               <motion.li 
